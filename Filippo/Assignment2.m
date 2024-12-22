@@ -29,3 +29,8 @@ fprintf('\n');
 
 %% ORBIT CHARACTERISATION
 a = 23300; % Semi-major axis [km]
+e = 0.523; % Eccentricity [-]
+i = deg2rad(58.65); % Inclination [rad]
+OM = 
+om = 
+theta0 = 0;
