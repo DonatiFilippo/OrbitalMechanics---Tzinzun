@@ -1,6 +1,6 @@
 %% Main script for Interplanetary Mission assignment %%
 %
-% Group number : 27
+% Group number : 2427
 %
 %--------------------------------------------------------------------------
 % Created and maintained by : 
