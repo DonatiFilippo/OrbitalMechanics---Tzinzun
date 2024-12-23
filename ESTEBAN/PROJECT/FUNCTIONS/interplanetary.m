@@ -1,4 +1,4 @@
-function dv = interplanetary (t1, t2, t3)
+function [dv, dv_dep, dv_arr, r1, v1i, r2, v2f, r3, v3f, v1t, v2t, v2t_1, v3t, vinfmin_vec, vinfplus_vec] = interplanetary (t1, t2, t3)
 %% FUNCTION DESCRIPTION
 %
 %--------------------------------------------------------------------------
@@ -8,6 +8,7 @@ function dv = interplanetary (t1, t2, t3)
 %
 %--------------------------------------------------------------------------
 % INPUTS:
+%
 %   t1          [1x1]       Time of departure           [mjd2000]
 %   t2          [1x1]       Time of fly-by              [mjd2000]
 %   t3          [1x1]       Time of arrival             [mjd2000]

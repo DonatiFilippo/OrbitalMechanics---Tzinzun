@@ -97,24 +97,24 @@ fprintf('\n\n');
 dt_windows = 1.5*365.25; % Duration of the first window with respect to the synodic periods (1.5 years) [days]
 step = 1; % We take a step of 1 day (adaptable)
 
-t_dep = mdj_dep : step : mdj_dep + dt_windows; % First departure window from Mercury
-t_fb = t_dep(1) + 1/2*tof_t1 : step : t_dep(end) + 3/2*tof_t1; % First arrival window on Earth
-t_arr = t_fb(1) + 1/2*tof_t2 : step : t_fb(end) + 3/2*tof_t2; % First arrival window on the asteroid
+w_dep = mdj_dep : step : mdj_dep + dt_windows; % First departure window from Mercury
+w_fb = w_dep(1) + 1/2*tof_t1 : step : w_dep(end) + 3/2*tof_t1; % First arrival window on Earth
+w_arr = w_fb(1) + 1/2*tof_t2 : step : w_fb(end) + 3/2*tof_t2; % First arrival window on the asteroid
 
 % We now consider that we should find an optimal solution between t_dep(1) and t_arr(end)
 
 %% BEST SOLUTION FINDER ALGORITHMS
 %% Genetic algorithm
-lower = [t_dep(1) t_fb(1) t_arr(1)];           
-upper = [t_dep(end) t_fb(end) t_arr(end)];               
+lower = [w_dep(1) w_fb(1) w_arr(1)];           
+upper = [w_dep(end) w_fb(end) w_arr(end)];               
 
 % Options for genetic
 options_ga = optimoptions('ga', 'PopulationSize', 500, ...
     'FunctionTolerance', 0.01, 'Display', 'off', 'MaxGenerations', 200);
 
 % Solver
-N = 18; % Number of departure windows examined
-N_ga = 5; % Number of genetic algorithm iteration to have better results
+N = 1; % Number of departure windows examined
+N_ga = 3; % Number of genetic algorithm iteration to have better results
 dv_min_ga = 50; % Arbitrary chosen value of total cost
 t_opt_ga = [0, 0, 0]; % Storage value for the chosen windows
 
@@ -129,6 +129,8 @@ for i = 1:N
         if dv_min_ga_computed < dv_min_ga
             dv_min_ga = dv_min_ga_computed;
             t_opt_ga = t_opt_ga_computed;
+            disp(t_opt_ga);
+            disp(dv_min_ga);
         end
 
         elapsedTime = toc(startTime);
@@ -181,10 +183,68 @@ fb_date = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
 arr_date = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
     arr_grad(2), arr_grad(3), arr_grad(1), arr_grad(4), arr_grad(5), arr_grad(6));
 
+disp(t_opt_grad);
 % Print refined solution with gradient
 fprintf('Refined solution with gradient :\n\n');
 fprintf('Departure date : %s \n', dep_date);
 fprintf('Fly-by date: %s \n', fb_date);
 fprintf('Arrival date : %s \n', arr_date);
-fprintf('Minimised cost with gradient : %f \n', dv_min_grad);
+fprintf('Minimised cost with gradient : %f km/s \n', dv_min_grad);
 
+%% PLOT RESULTS
+%% Results 
+[dv_opt, dv_dep, dv_arr, r1, v1i, r2, v2f, r3, v3f, v1t, v2t, v2t_1, v3t, vinfmin_vec, vinfplus_vec] = interplanetary(t_opt_grad(1), t_opt_grad(2), t_opt_grad(3));
+[vinfm, vinfp, delta, rp, am, ap, em, ep, vpm, vpp, deltam, deltap, dv_fb, dvp] = flyby_powered(vinfmin_vec, vinfplus_vec, muE);
+
+%% Heliocentric trajectory
+% Initialisation
+N = 50000;
+
+t_dep = t_opt_grad(1) * 86400;
+t_fb = t_opt_grad(2) * 86400;
+t_arr = t_opt_grad(3) * 86400;
+
+dt_leg1 = t_fb - t_dep;
+dt_leg2 = t_arr - t_fb;
+
+tspan_mercury = linspace(0, T_dep, N);
+tspan_leg1 = linspace(0, -dt_leg1, N);
+tspan_earth = linspace(0, T_fb, N);
+tspan_leg2 = linspace(0, -dt_leg2, N);
+tspan_asteroid = linspace(0, T_arr, N);
+
+% Solver options
+options = odeset( 'RelTol', 1e-13, 'AbsTol', 1e-14 );
+
+% Matrices defining
+y_mercury = [ r1; v1i ];
+y_leg1 = [ r2; v2t' ];
+y_earth = [ r2; v2f ];
+y_leg2 = [ r3; v3t' ];
+y_ast = [ r3; v3f ];
+
+[ t1, Y_mercury ] = ode113(@(t,y) ode_2bp(t,y,muS), tspan_mercury, y_mercury, options);
+[ t2, Y_leg1 ] = ode113(@(t,y) ode_2bp(t,y,muS), tspan_leg1, y_leg1, options);
+[ t3, Y_earth ] = ode113(@(t,y) ode_2bp(t,y,muS), tspan_earth, y_earth, options);
+[ t4, Y_leg2 ] = ode113(@(t,y) ode_2bp(t,y,muS), tspan_leg2, y_leg2, options);
+[ t5, Y_ast] = ode113(@(t,y) ode_2bp(t,y,muS), tspan_asteroid, y_ast, options);
+
+% Plot
+n = 1.496e+8;
+
+figure();
+plot3(Y_mercury(:,1)/n, Y_mercury(:,2)/n,  Y_mercury(:,3)/n, 'b-', 'LineWidth', 1);
+hold on;
+plot3(Y_leg1(:,1)/n, Y_leg1(:,2)/n,  Y_leg1(:,3)/n, 'm:', 'LineWidth', 1);
+plot3(Y_earth(:,1)/n, Y_earth(:,2)/n,  Y_earth(:,3)/n, 'r-', 'LineWidth', 1);
+plot3(Y_leg2(:,1)/n, Y_leg2(:,2)/n,  Y_leg2(:,3)/n, 'g:', 'LineWidth', 1);
+plot3(Y_ast(:,1)/n, Y_ast(:,2)/n, Y_ast(:,3)/n, 'y-', 'LineWidth', 1);
+xlabel('X [AU]');
+ylabel('Y [AU]');
+zlabel('Z [AU]');
+title('Heliocentric trajectory');
+axis([-2.5 2.5 -2.5 2.5 -2.5 2.5]);
+grid on;
+
+legend('Mercury''s orbit', 'Transfer orbit to Earth', 'Earth''s orbit', "Transfer orbit to the asteroid", "Asteroid''s orbit");
+hold off;

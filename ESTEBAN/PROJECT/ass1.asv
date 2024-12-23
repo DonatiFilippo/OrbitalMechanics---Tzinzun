@@ -113,8 +113,8 @@ options_ga = optimoptions('ga', 'PopulationSize', 500, ...
     'FunctionTolerance', 0.01, 'Display', 'off', 'MaxGenerations', 200);
 
 % Solver
-N = 18; % Number of departure windows examined
-N_ga = 5; % Number of genetic algorithm iteration to have better results
+N = 1; % Number of departure windows examined
+N_ga = 3; % Number of genetic algorithm iteration to have better results
 dv_min_ga = 50; % Arbitrary chosen value of total cost
 t_opt_ga = [0, 0, 0]; % Storage value for the chosen windows
 
@@ -188,72 +188,59 @@ fprintf('Fly-by date: %s \n', fb_date);
 fprintf('Arrival date : %s \n', arr_date);
 fprintf('Minimised cost with gradient : %f \n', dv_min_grad);
 
-%% PLOTS
-%% PORK-CHOP PLOTS
-% Initial condition
-t_dep = mdj_dep : step : mdj_dep + dt_windows; % First departure window from Mercury
-t_fb = t_dep(1) + 1/2*tof_t1 : step : t_dep(end) + 3/2*tof_t1; % First arrival window on Earth
-t_arr = t_fb(1) + 1/2*tof_t2 : step : t_fb(end) + 3/2*tof_t2; % First arrival window on the asteroid
+%% PLOT RESULTS
+%% Results 
+[dv_opt, dv_dep, dv_fb, dv_arr, r1, v1i, r2, v2f, r3, v3f, v1t, v2t, v2t_1, v3t, vinfmin_vec, vinfplus_vec] = interplanetary (t_opt_grad(1), t_opt_grad(2), t_opt_grad(3));
+[vinfm, vinfp, delta, rp, am, ap, em, ep, vpm, vpp, deltam, deltap, dv, dvp] = flyby_powered(vinfmin_vec, vinfplus_vec, muE);
 
-dt_dep = t_dep(end) - t_dep(1) + 1;
-dt_fb = t_fb(end) - t_fb(1) + 1;
-dt_arr = t_arr(end) - t_arr(1) + 1;
+%% Heliocentric trajectory
+% Initialisation
+N = 50000;
 
-% Compute dv
-dv_1 = zeros(dt_dep, dt_fb);
-dv_2 = zeros(dt_fb, dt_arr);
+t_dep = t_opt_grad(1) * 86400;
 
-for i = 1:dt_dep
-    for j = 1:dt_fb
-        for k = 1:dt_arr
-            time_dep = t_dep(1) + (i - 1);  
-            time_fb = t_fb(1) + (j - 1);
-            time_arr = t_arr(1) + (k - 1); 
-            dv_1(i, j) = vtot(time_dep, time_fb);
-            dv_2(j, k) = vtot(time_fb, time_arr); 
-        end
-    end
-end
+t_arr = t_opt_grad(3) * 86400;
 
-% Create matrices to plot
-[X, Ya] = meshgrid(t_dep(1):t_dep(end), t_fb(1):t_fb(end));
-[Yb, Z] = meshgrid(t_dep(1):t_dep(end), t_fb(1):t_fb(end));
+dt_leg1 = 
 
-p = 31;
+tspan_mercury = linspace(0, T_dep, N);
+tspan_leg1 = linspace(t0, tf, N);
+tspan_earth = linspace(0, T_fb, N);
+tspan_leg2 = linspace(t0, tf, N);
+tspan_asteroid = linspace(0, T_arr, N);
 
-X_unique = [X(1, 1), X(1, 1+p:p:end), X(1, end)];
-Ya_unique = [Ya(1, 1); Ya(1+p:p:end, 1); Ya(end, 1)];
-Yb_unique = [Yb(1, 1); Yb(1+p:p:end, 1); Yb(end, 1)];
-Z_unique = [Z(1, 1); Z(1+p:p:end, 1); Z(end, 1)];
+% Solver options
+options = odeset( 'RelTol', 1e-13, 'AbsTol', 1e-14 );
 
-X1 = arrayfun(@(x) mjd20002date(x), X_unique, 'UniformOutput', false);
-Ya1 = arrayfun(@(ya) mjd20002date(ya), Ya_unique, 'UniformOutput', false);
-Yb1 = arrayfun(@(yb) mjd20002date(yb), Yb_unique, 'UniformOutput', false);
-Z1 = arrayfun(@(z) mjd20002date(z), Z_unique, 'UniformOutput', false);
+% Matrices defining
+y_mercury = [ r1; v1i ];
+y_leg1 = [ r1; v1t' ];
+y_earth = [ r2; v2f ];
+y_leg2 = [ r2; v2t_1' ];
+y_ast = [ r3; v3f ];
 
-X2 = cellfun(@(d) sprintf('%04d-%02d-%02d', d(1), d(2), d(3)), X1, 'UniformOutput', false);
-Ya2 = cellfun(@(d) sprintf('%04d-%02d-%02d', d(1), d(2), d(3)), Ya1, 'UniformOutput', false);
-Yb2 = cellfun(@(d) sprintf('%04d-%02d-%02d', d(1), d(2), d(3)), Yb1, 'UniformOutput', false);
-Z = cellfun(@(d) sprintf('%04d-%02d-%02d', d(1), d(2), d(3)), Z1, 'UniformOutput', false);
+[ t1, Y_mercury ] = ode113(@(t,y) ode_2bp(t,y,muS), tspan, y_mercury, options);
+[ t2, Y_leg1 ] = ode113(@(t,y) ode_2bp(t,y,muS), tspan, y_leg1, options);
+[ t3, Y_earth ] = ode113(@(t,y) ode_2bp(t,y,muS), tspan, y_earth, options);
+[ t4, Y_leg2 ] = ode113(@(t,y) ode_2bp(t,y,muS), tspan, y_leg2, options);
+[ t5, Y_ast] = ode113(@(t,y) ode_2bp(t,y,muS), tspan, y_ast, options);
 
-% Ploting
-figure;
-levels = 5:1:10;
+% Plot
+n = 1.496e+8;
 
-[contourMatrix1, h1] = contour(X, Ya, dv_1', levels, 'LineWidth', 0.5);
-[contourMatrix2, h2] = contour(Yb, Z, dv_2', levels, 'LineWidth', 0.5);
-
-%clabel(contourMatrix1, h1, 'FontSize', 8, 'Color', 'k');
-%clabel(contourMatrix2, h2, 'FontSize', 8, 'Color', 'k');
-
-colorbar; 
-ylabel(colorbar, '\Delta v [km/s]');
-
-% Add ticks and labels
-xlabel('Departure date');
-ylabel('Arrival date');
-title('Porkchop plot');
+figure();
+plot3(Y_mercury(:,1)/n, Y_mercury(:,2)/n,  Y_mercury(:,3)/n, 'b-', 'LineWidth', 1);
+hold on;
+plot3(Y_leg1(:,1)/n, Y_leg1(:,2)/n,  Y_leg1(:,3)/n, 'm:', 'LineWidth', 1);
+plot3(Y_earth(:,1)/n, Y_earth(:,2)/n,  Y_earth(:,3)/n, 'r-', 'LineWidth', 1);
+plot3(Y_leg2(:,1)/n, Y_leg2(:,2)/n,  Y_leg2(:,3)/n, 'g:', 'LineWidth', 1);
+plot3(Y_ast(:,1)/n, Y_ast(:,2)/n, Y_ast(:,3)/n, 'y-', 'LineWidth', 1);
+xlabel('X [AU]');
+ylabel('Y [AU]');
+zlabel('Z [AU]');
+title('Heliocentric trajectory');
+axis([-2.5 2.5 -2.5 2.5 -2.5 2.5]);
 grid on;
 
-set(gca, 'XTick', X_unique, 'XTickLabel', X2);
-set(gca, 'YTick', Y1_unique, 'YTickLabel', Ya2);
+legend('Mercury''s orbit', 'Transfer orbit to Earth', 'Earth''s orbit', "Transfer orbit to the asteroid", "Asteroid''s orbit");
+hold off;

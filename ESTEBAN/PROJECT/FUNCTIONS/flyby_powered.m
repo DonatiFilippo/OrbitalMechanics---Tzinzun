@@ -1,4 +1,35 @@
 function [vinfm, vinfp, delta, rp, am, ap, em, ep, vpm, vpp, deltam, deltap, dv, dvp] = flyby_powered(vinfmin_vec, vinfplus_vec, mu)
+%% FUNCTION DESCRIPTION
+%
+%--------------------------------------------------------------------------
+% DESCRIPTION:
+% This code provides all data correlated to a powered gravity-assist 
+% manoeuvre
+%
+%--------------------------------------------------------------------------
+% INPUTS:
+%
+% vinfmin_vec     [1x3]    Velocity at infinite before fb    [km/s]
+% vinfplus_vec    [1x3]    Velocity at infinite after fb     [km/s]
+%
+%--------------------------------------------------------------------------
+% OUTPUT:
+%
+%   TO DO ...
+%
+%--------------------------------------------------------------------------
+% Group number : 27
+%
+% Created and maintained by : 
+%
+% Azevedo Da Silva Esteban
+% Gavidia Pantoja Maria Paulina
+% Donati Filippo 
+% Domenichelli Eleonora
+% 
+%--------------------------------------------------------------------------
+% LAST UPDATE: 21-12-2024
+%
 
 vinfm = norm(vinfmin_vec);
 vinfp = norm(vinfplus_vec);
