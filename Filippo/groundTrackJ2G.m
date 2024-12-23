@@ -6,7 +6,7 @@ function [alpha,delta, lon, lat] = groundTrackJ2G(y0, tv, theta, mu, om, J, R, m
 %% Propagator
 options = odeset('RelTol', 1e-13, 'AbsTol', 1e-14);
 [tu, yu] = ode113(@(t, y) gaussFun(t, y, accPert(t, y,mu, J, R, muM,start),mu), tv, y0, options);
-l = length(tv);
+l = size(tv,2);
 rr = zeros(l, 3);
 for i = 1:l
     rrv = kep2car(yu(i, 1), yu(i, 2), yu(i, 3), yu(i, 4), yu(i, 5), yu(i, 6), mu);
