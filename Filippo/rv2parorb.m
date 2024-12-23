@@ -1,4 +1,22 @@
-function [a, e, i, OM, om, theta] = car2kep(rr, vv, mu)
+function [a, e, i, OM, om, theta] = rv2parorb(rr, vv, mu)
+
+%Transformation from Cartesian state to orbital elements
+%
+%Input arguments:
+%rr             [3x1]  position vector              [km]
+%vv             [3x1]  velocity vector              [km/s]
+%mu             [1x1]  gravitational parameter      [km^3/s^2]
+%
+%-------------------------------------------------------------------------
+%Output arguments:
+%a              [1x1]  semi-major axis              [km]
+%e              [1x1]  eccentricity                 [-]
+%i              [1x1]  inclination                  [rad]
+%OM             [1x1]  RAAN                         [rad]
+%om             [1x1]  pericenter anomaly           [rad]
+%theta          [1x1]  true anomaly                 [rad]
+%-------------------------------------------------------------------------
+
 %versori del sistema geocentrico
 I=[1; 0; 0];
 J=[0; 1; 0];
@@ -56,6 +74,5 @@ if(v_r>=0)
 else
     theta=2*pi-acos(dot(ee,rr)/(e*r));
 end
-
+   
 end
-
