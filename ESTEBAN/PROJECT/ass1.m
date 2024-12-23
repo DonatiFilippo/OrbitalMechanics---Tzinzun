@@ -30,8 +30,8 @@ fprintf('\n');
 Departure_date = [2030, 1, 1, 0, 0, 0]; % Earliest departure date [Gregorian date]
 Arrival_date = [2060, 1, 1, 0, 0, 0]; % Latest arrival date [Gregorian date]
  
-mdj_dep = date2mjd2000(Departure_date); % Earliest departure date conversion from Gregorian date to modified Julian day 2000 number
-mdj_arr = date2mjd2000(Arrival_date); % Latest arrival date conversion from Gregorian date to modified Julian day 2000 number
+mdj_dep = date2mjd2000(Departure_date); % Earliest departure date converted to modified Julian day 2000
+mdj_arr = date2mjd2000(Arrival_date); % Latest arrival date converted to modified Julian day 2000
 
 %% PHYSICAL PARAMETERS
 Departure_planet = 1; % Mercury as the departure planet 
@@ -110,19 +110,36 @@ upper = [t_dep(end) t_fb(end) t_arr(end)];
 
 % Options for genetic
 options_ga = optimoptions('ga', 'PopulationSize', 500, ...
-    'FunctionTolerance', 0.01, 'Display', 'iter', 'MaxGenerations', 200);
+    'FunctionTolerance', 0.01, 'Display', 'off', 'MaxGenerations', 200);
 
 % Solver
-N = 3; % Number of iteration to have better results
+N = 18; % Number of departure windows examined
+N_ga = 5; % Number of genetic algorithm iteration to have better results
 dv_min_ga = 50; % Arbitrary chosen value of total cost
 t_opt_ga = [0, 0, 0]; % Storage value for the chosen windows
 
+fprintf('Genetic algorithm computing ... \n\n');
+startTime = tic;
 for i = 1:N
-   [t_opt_ga_computed, dv_min_ga_computed] = ga(@(t) interplanetary(t(1),t(2),t(3)), 3, [], [], [], [], lower, upper, [], options_ga);
-   if dv_min_ga_computed < dv_min_ga
-       dv_min_ga = dv_min_ga_computed;
-       t_opt_ga = t_opt_ga_computed;
-   end
+    fprintf('ITERATION NUMBER : %2.f \n \n', i);
+
+    for j = 1:N_ga
+        [t_opt_ga_computed, dv_min_ga_computed] = ga(@(t) interplanetary(t(1),t(2),t(3)), 3, [], [], [], [], lower, upper, [], options_ga);
+
+        if dv_min_ga_computed < dv_min_ga
+            dv_min_ga = dv_min_ga_computed;
+            t_opt_ga = t_opt_ga_computed;
+        end
+
+        elapsedTime = toc(startTime);
+        fprintf('Elapsed time : \n\n');
+        fprintf('\n\n\n\n\n\n\n\n');
+        fprintf('\b\b\b\b\b\b\b\b\b\b\b%6.2f s', elapsedTime);
+        fprintf('\n\n');
+    end
+
+    lower = lower + dt_windows;
+    upper = lower + dt_windows;
 end
  
 % Results with ga
@@ -226,8 +243,8 @@ levels = 5:1:10;
 [contourMatrix1, h1] = contour(X, Ya, dv_1', levels, 'LineWidth', 0.5);
 [contourMatrix2, h2] = contour(Yb, Z, dv_2', levels, 'LineWidth', 0.5);
 
-clabel(contourMatrix1, h1, 'FontSize', 8, 'Color', 'k');
-clabel(contourMatrix2, h2, 'FontSize', 8, 'Color', 'k');
+%clabel(contourMatrix1, h1, 'FontSize', 8, 'Color', 'k');
+%clabel(contourMatrix2, h2, 'FontSize', 8, 'Color', 'k');
 
 colorbar; 
 ylabel(colorbar, '\Delta v [km/s]');
