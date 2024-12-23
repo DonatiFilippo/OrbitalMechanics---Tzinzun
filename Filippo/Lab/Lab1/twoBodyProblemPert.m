@@ -9,7 +9,7 @@ aa = (3/2) * ((J*mu*R^2)/r^4) * [((rr(1)/r) * ((5*rr(3)^2 / r^2) - 1));
                                 ((rr(2)/r) * ((5*rr(3)^2 / r^2) - 1));
                                 ((rr(3)/r) * ((5*rr(3)^2 / r^2) - 3))];
 
-[a,e,i,o,u,th] = car2kep(rr, vv, mu);
+[a,e,i,o,u,th] = rv2parorb(rr, vv, mu);
 s2 = vertcat(a,e,i,o, u, th);
 am = accMoon(t, s2, muM, mu,start);
 
