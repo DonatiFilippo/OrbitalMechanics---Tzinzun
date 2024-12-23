@@ -42,6 +42,8 @@ muM = astroConstants(11); % Mercury's gravitational constant [km^3/s^2]
 muE = astroConstants(13); % Earth's gravitational constant [km^3/s^2]
 muS = astroConstants(4); % Sun's gravitational constant [km^3/s^2]
 
+Re = astroConstants(23);
+
 % Keplerian elements computing / kep = [a e i Om om theta] [km, rad]
 [kep_dep, ~] = uplanet(0, Departure_planet); % Mercury's keplerian elements at initial time
 [kep_fb, ~] = uplanet(0, Flyby_planet); % Earth's keplerian elements at initial time
@@ -98,8 +100,8 @@ dt_windows = 1.5*365.25; % Duration of the first window with respect to the syno
 step = 1; % We take a step of 1 day (adaptable)
 
 w_dep = mdj_dep : step : mdj_dep + dt_windows; % First departure window from Mercury
-w_fb = w_dep(1) + 1/2*tof_t1 : step : w_dep(end) + 3/2*tof_t1; % First arrival window on Earth
-w_arr = w_fb(1) + 1/2*tof_t2 : step : w_fb(end) + 3/2*tof_t2; % First arrival window on the asteroid
+w_fb = w_dep(1) + 1/3*tof_t1 : step : w_dep(end) + 2/3*tof_t1; % First arrival window on Earth
+w_arr = w_fb(1) + 1/3*tof_t2 : step : w_fb(end) + 2/3*tof_t2; % First arrival window on the asteroid
 
 % We now consider that we should find an optimal solution between t_dep(1) and t_arr(end)
 
@@ -113,7 +115,7 @@ options_ga = optimoptions('ga', 'PopulationSize', 500, ...
     'FunctionTolerance', 0.01, 'Display', 'off', 'MaxGenerations', 200);
 
 % Solver
-N = 1; % Number of departure windows examined
+N = 19; % Number of departure windows examined
 N_ga = 3; % Number of genetic algorithm iteration to have better results
 dv_min_ga = 50; % Arbitrary chosen value of total cost
 t_opt_ga = [0, 0, 0]; % Storage value for the chosen windows
@@ -125,14 +127,11 @@ for i = 1:N
 
     for j = 1:N_ga
         [t_opt_ga_computed, dv_min_ga_computed] = ga(@(t) interplanetary(t(1),t(2),t(3)), 3, [], [], [], [], lower, upper, [], options_ga);
-
-        if dv_min_ga_computed < dv_min_ga
+        %dt = t_opt_ga_computed(3) - t_opt_ga_computed(1);
+        if dv_min_ga_computed < dv_min_ga %&& dt <= 1.5*365
             dv_min_ga = dv_min_ga_computed;
             t_opt_ga = t_opt_ga_computed;
-            disp(t_opt_ga);
-            disp(dv_min_ga);
         end
-
         elapsedTime = toc(startTime);
         fprintf('Elapsed time : \n\n');
         fprintf('\n\n\n\n\n\n\n\n');
@@ -149,18 +148,18 @@ dep_grad = mjd20002date(ceil(t_opt_ga(1)));
 fb_grad = mjd20002date(ceil(t_opt_ga(2)));
 arr_grad = mjd20002date(ceil(t_opt_ga(3)));
 
-dep_date = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
+dep_date_ga = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
     dep_grad(2), dep_grad(3), dep_grad(1), dep_grad(4), dep_grad(5), dep_grad(6));
-fb_date = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
+fb_date_ga = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
     fb_grad(2), fb_grad(3), fb_grad(1), fb_grad(4), fb_grad(5), fb_grad(6));
-arr_date = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
+arr_date_ga = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
     arr_grad(2), arr_grad(3), arr_grad(1), arr_grad(4), arr_grad(5), arr_grad(6));
 
 % Print  results with ga
 fprintf('Optmised results with ga :\n\n');
-fprintf('Departure date : %s \n', dep_date);
-fprintf('Fly-by date: %s \n', fb_date);
-fprintf('Arrival date : %s \n', arr_date);
+fprintf('Departure date : %s \n', dep_date_ga);
+fprintf('Fly-by date: %s \n', fb_date_ga);
+fprintf('Arrival date : %s \n', arr_date_ga);
 fprintf('Total optimised cost (dv) : %f km/s \n', dv_min_ga);
 fprintf('\n\n');
 
@@ -176,29 +175,36 @@ dep_grad = mjd20002date(ceil(t_opt_grad(1)));
 fb_grad = mjd20002date(ceil(t_opt_grad(2)));
 arr_grad = mjd20002date(ceil(t_opt_grad(3)));
 
-dep_date = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
+dep_date_grad = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
     dep_grad(2), dep_grad(3), dep_grad(1), dep_grad(4), dep_grad(5), dep_grad(6));
-fb_date = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
+fb_date_grad = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
     fb_grad(2), fb_grad(3), fb_grad(1), fb_grad(4), fb_grad(5), fb_grad(6));
-arr_date = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
+arr_date_grad = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
     arr_grad(2), arr_grad(3), arr_grad(1), arr_grad(4), arr_grad(5), arr_grad(6));
 
 disp(t_opt_grad);
 % Print refined solution with gradient
 fprintf('Refined solution with gradient :\n\n');
-fprintf('Departure date : %s \n', dep_date);
-fprintf('Fly-by date: %s \n', fb_date);
-fprintf('Arrival date : %s \n', arr_date);
+fprintf('Departure date : %s \n', dep_date_grad);
+fprintf('Fly-by date: %s \n', fb_date_grad);
+fprintf('Arrival date : %s \n', arr_date_grad);
 fprintf('Minimised cost with gradient : %f km/s \n', dv_min_grad);
+fprintf('\n\n');
 
 %% PLOT RESULTS
 %% Results 
 [dv_opt, dv_dep, dv_arr, r1, v1i, r2, v2f, r3, v3f, v1t, v2t, v2t_1, v3t, vinfmin_vec, vinfplus_vec] = interplanetary(t_opt_grad(1), t_opt_grad(2), t_opt_grad(3));
-[vinfm, vinfp, delta, rp, am, ap, em, ep, vpm, vpp, deltam, deltap, dv_fb, dvp] = flyby_powered(vinfmin_vec, vinfplus_vec, muE);
+[vinfm, vinfp, delta, rp, am, ap, em, ep, vpm, vpp, deltam, deltap, dv_fb_tot, dv_fb_pow] = flyby_powered(vinfmin_vec, vinfplus_vec, muE);
+
+%fprintf('The final solution is :\n\n');
+%fprintf('Departure date : %s \n', dep_date_grad);
+%fprintf('Fly-by date: %s \n', fb_date_grad);
+%fprintf('Arrival date : %s \n', arr_date_grad);
+%fprintf('\n\n');
 
 %% Heliocentric trajectory
 % Initialisation
-N = 50000;
+N_t = 50000;
 
 t_dep = t_opt_grad(1) * 86400;
 t_fb = t_opt_grad(2) * 86400;
@@ -207,13 +213,13 @@ t_arr = t_opt_grad(3) * 86400;
 dt_leg1 = t_fb - t_dep;
 dt_leg2 = t_arr - t_fb;
 
-tspan_mercury = linspace(0, T_dep, N);
-tspan_leg1 = linspace(0, -dt_leg1, N);
-tspan_earth = linspace(0, T_fb, N);
-tspan_leg2 = linspace(0, -dt_leg2, N);
-tspan_asteroid = linspace(0, T_arr, N);
+tspan_mercury = linspace(0, T_dep, N_t);
+tspan_leg1 = linspace(0, -dt_leg1, N_t);
+tspan_earth = linspace(0, T_fb, N_t);
+tspan_leg2 = linspace(0, -dt_leg2, N_t);
+tspan_asteroid = linspace(0, T_arr, N_t);
 
-% Solver options
+% Set options for ODE solver
 options = odeset( 'RelTol', 1e-13, 'AbsTol', 1e-14 );
 
 % Matrices defining
@@ -235,9 +241,9 @@ n = 1.496e+8;
 figure();
 plot3(Y_mercury(:,1)/n, Y_mercury(:,2)/n,  Y_mercury(:,3)/n, 'b-', 'LineWidth', 1);
 hold on;
-plot3(Y_leg1(:,1)/n, Y_leg1(:,2)/n,  Y_leg1(:,3)/n, 'm:', 'LineWidth', 1);
+plot3(Y_leg1(:,1)/n, Y_leg1(:,2)/n,  Y_leg1(:,3)/n, 'm-', 'LineWidth', 1);
 plot3(Y_earth(:,1)/n, Y_earth(:,2)/n,  Y_earth(:,3)/n, 'r-', 'LineWidth', 1);
-plot3(Y_leg2(:,1)/n, Y_leg2(:,2)/n,  Y_leg2(:,3)/n, 'g:', 'LineWidth', 1);
+plot3(Y_leg2(:,1)/n, Y_leg2(:,2)/n,  Y_leg2(:,3)/n, 'g-', 'LineWidth', 1);
 plot3(Y_ast(:,1)/n, Y_ast(:,2)/n, Y_ast(:,3)/n, 'y-', 'LineWidth', 1);
 xlabel('X [AU]');
 ylabel('Y [AU]');
@@ -246,5 +252,65 @@ title('Heliocentric trajectory');
 axis([-2.5 2.5 -2.5 2.5 -2.5 2.5]);
 grid on;
 
-legend('Mercury''s orbit', 'Transfer orbit to Earth', 'Earth''s orbit', "Transfer orbit to the asteroid", "Asteroid''s orbit");
+legend("Mercury's orbit", "Transfer orbit to Earth", "Earth's orbit", "Transfer orbit to the asteroid", "Asteroid's orbit");
 hold off;
+
+%% Fly-by trajectory (planetocentric)
+% Results
+IPm = -am*em*cos(deltam); % Impact paramater for incoming hyperbolic trajectory
+IPp = -ap*ep*cos(deltap); % Impact paramater for outgoing hyperbolic trajectory
+
+CA = min(IPm, IPp); % Altitude of the closest approach
+
+fprintf('The altitude of the closest approach is : %f km \n\n', CA);
+
+fprintf('The total velocity change due to flyby is : %f km/s \n', dv_fb_tot);
+fprintf('The cost of the manoeuvre at pericentre is : %f km/s \n\n', dv_fb_pow);
+
+% Initial conditions planetocentric
+u = cross(vinfmin_vec,vinfplus_vec)/norm(cross(vinfmin_vec,vinfplus_vec));
+
+betam = pi/2 - deltam/2;
+
+dir_vm = vinfmin_vec/norm(vinfmin_vec); % Vinf- velocity direction
+dir_vp = vinfplus_vec/norm(vinfplus_vec); % Vinf+ velocity direction
+
+dirm = Rotate(dir_vm, u, deltam/2); 
+dirp = Rotate(dir_vp, u, -deltap/2);
+
+r0 = rp * Rotate(dir_vm, u, -betam);
+
+vm = vpm*dirm;
+vp = vpp*dirp;
+
+% Time span planetocentric
+tspan_m = linspace(0, -50000, 100000);
+tspan_p = linspace(0, 50000, 100000);
+
+% Set options for ODE solver
+options_fb = odeset('RelTol', 1e-13, 'AbsTol', 1e-14);
+
+% Integration of planetocentric trajectory
+y0m = [r0; vm];
+y0p = [r0; vp];
+
+[t_fb_min, Y_fb_min] = ode113(@(t, y) ode_2bp(t, y, muE), tspan_m, y0m, options_fb);
+
+[t_fb_plus, Y_fb_plus] = ode113(@(t, y) ode_2bp(t, y, muE), tspan_p, y0p, options_fb);
+
+% Plot
+figure();
+hold on;
+
+plot(Y_fb_min(:, 1) / Re, Y_fb_min(:, 2) / Re, 'b-', 'LineWidth', 1.5, 'DisplayName', 'Flyby hyperbola (infront)');
+plot(Y_fb_plus(:, 1) / Re, Y_fb_plus(:, 2) / Re, 'b-', 'LineWidth', 1.5);
+plot(0, 0, 'yo', 'MarkerSize', 15, 'MarkerFaceColor', 'blue', 'DisplayName', 'Earth');
+
+xlabel('x [Re]');
+ylabel('y [Re]');
+title('Trajectory in Earth-centred frame parallel to (HECI)');
+axis equal;
+grid on;
+
+xlim([-6, 9]);
+ylim([-9, 3]);
