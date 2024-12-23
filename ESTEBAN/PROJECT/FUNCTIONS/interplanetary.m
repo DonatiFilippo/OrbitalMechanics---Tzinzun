@@ -57,7 +57,7 @@ dt2 = (t3 - t2)*86400;
 if ERROR1 == 0 && ERROR2 == 0
         vinfmin_vec = v2t' - v2f;
         vinfplus_vec = v2t_1' - v2f;
-        [~, ~, ~, rp_fb, ~, ~, ~, ~, ~, ~, ~, ~, dv_fb, ~] = flyby_powered(vinfmin_vec, vinfplus_vec, muE);
+        [~, ~, ~, rp_fb, ~, ~, ~, ~, ~, ~, ~, ~, ~, dv_fb] = flyby_powered(vinfmin_vec, vinfplus_vec, muE);
 
         if not(isnan(rp_fb))
             dv_dep = norm(v1t' - v1i);
