@@ -19,7 +19,7 @@ ar = acc(1);
 as = acc(2);
 aw = acc(3);
 
-a_dot = (2*a^2/h)*(e*sin(th)*ar+p*as/r);
+a_dot = (2*(a^2)/h)*(e*sin(th)*ar+p*as/r);
 e_dot = (1/h)*(p*sin(th)*ar+((p+r)*cos(th)+r*e)*as);
 i_dot = r*cos(th+om)*aw/h;
 OM_dot = r*sin(th+om)*aw/(h*sin(i));

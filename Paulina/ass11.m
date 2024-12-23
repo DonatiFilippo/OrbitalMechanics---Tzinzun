@@ -156,32 +156,33 @@ date_arr_sa = mjd20002date(t_refined_sa(3)); % Arrival date
 
 %% Resultados
 
+% Genetic Algorithm
 fprintf('\n Genetic Algorithm Results:\n');
 fprintf('Departure: %02d/%02d/%04d\n', date_dep_ga(3), date_dep_ga(2), date_dep_ga(1));
 fprintf('Flyby: %02d/%02d/%04d\n', date_fb_ga(3), date_fb_ga(2), date_fb_ga(1));
 fprintf('Arrival: %02d/%02d/%04d\n', date_arr_ga(3), date_arr_ga(2), date_arr_ga(1));
 fprintf('Delta-v: %.2f km/s\n', dv_min_ga);
 
-
-fprintf('\n FMINCON/Local Refinment Results:\n');
+% FMINCON Refinement
+fprintf('\n FMINCON/Local Refinement Results:\n');
 fprintf('Departure: %02d/%02d/%04d\n', date_dep_ref(3), date_dep_ref(2), date_dep_ref(1));
 fprintf('Flyby: %02d/%02d/%04d\n', date_fb_ref(3), date_fb_ref(2), date_fb_ref(1));
 fprintf('Arrival: %02d/%02d/%04d\n', date_arr_ref(3), date_arr_ref(2), date_arr_ref(1));
 fprintf('Delta-v: %.2f km/s\n', dv_min_refined);
 
-
+% PSO/Differential Algorithm
 fprintf('\n PSO/Differential Algorithm Results:\n');
-fprintf('Departure: %02d/%02d/%04d\n', date_arr_ref2(1));
-fprintf('Flyby: %02d/%02d/%04d\n', date_arr_ref2(2));
-fprintf('Arrival: %02d/%02d/%04d\n', date_arr_ref2(3));
-fprintf('Delta-v: %02d/%02d/%04d\n', dv_min_pso);
+fprintf('Departure: %02d/%02d/%04d\n', date_dep_ref2(3), date_dep_ref2(2), date_dep_ref2(1));
+fprintf('Flyby: %02d/%02d/%04d\n', date_fb_ref2(3), date_fb_ref2(2), date_fb_ref2(1));
+fprintf('Arrival: %02d/%02d/%04d\n', date_arr_ref2(3), date_arr_ref2(2), date_arr_ref2(1));
+fprintf('Delta-v: %.2f km/s\n', dv_min_pso);
 
-
+% Simulated Annealing
 fprintf('\n Simulated Annealing Results:\n');
-fprintf('Departure: %02d/%02d/%04d \n', date_arr_sa(1));
-fprintf('Flyby: %02d/%02d/%04d \n', date_arr_sa(2));
-fprintf('Arrival: %02d/%02d/%04d \n', date_arr_sa(3));
-fprintf('Delta-v: %02d/%02d/%04d \n', dv_min_sa);
+fprintf('Departure: %02d/%02d/%04d \n', date_dep_sa(3), date_dep_sa(2), date_dep_sa(1));
+fprintf('Flyby: %02d/%02d/%04d \n', date_fb_sa(3), date_fb_sa(2), date_fb_sa(1));
+fprintf('Arrival: %02d/%02d/%04d \n', date_arr_sa(3), date_arr_sa(2), date_arr_sa(1));
+fprintf('Delta-v: %.2f km/s\n', dv_min_sa);
 
 %% GENERATE CHOP PLOT
 fprintf('Generating CHOP Plot...\n');
