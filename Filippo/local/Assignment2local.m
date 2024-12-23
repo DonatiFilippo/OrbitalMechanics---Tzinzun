@@ -136,7 +136,7 @@ end
 % plot(tu,yu(:, 6));
 % title("theta");
 %% 
-tv = linspace(0, 1000*T, N);
+tv = linspace(0, 50*T, N);
 options = odeset('RelTol', 1e-13, 'AbsTol', 1e-14);
 [tuc, keple] = ode113(@(t, y) twoBodyProblemPert(t, y, mu_E, J2, R_E, mu_Moon, st), tv, y0, options);
 l = size(tuc,1);
@@ -170,44 +170,89 @@ fprintf('Tnh\n');
 options = odeset('RelTol', 1e-13, 'AbsTol', 1e-14);
 [tuc, yut] = ode113(@(t, y) gaussTNH(t, y, accPertTNH(t, y, mu_E, J2, R_E, mu_Moon, st),mu_E), tv, y0g, options);
 
+%% 
 figure
 
-plot(tu,yut(:, 1));
+plot(tuc/T,yut(:, 1));
 grid on
 title("a");
 figure
-plot(tu,yut(:, 2));
+plot(tuc/T,yut(:, 2));
 title("e");
 grid on
 figure
 
-plot(tu,yut(:, 3));
+plot(tuc/T,yut(:, 3));
 title("i");
 grid on
 figure
 
-plot(tu,yut(:, 4));
+plot(tuc/T,rad2deg(yut(:, 4)));
 title("OM");
 grid on
 figure
 
-plot(tu,yut(:, 5));
+plot(tuc/T,yut(:, 5));
 grid on
 title("om");
 figure
 
-plot(tu,yut(:, 6));
+plot(tuc/T,yut(:, 6));
 grid on
 title("theta");
 
 %%
 Earth_3D;
 hold on
-scatter3( keple(:,1), keple(:,2), keple(:,3),5, tuc./T, 'filled');
+scatter3( keple(:,1), keple(:,2), keple(:,3),10, tuc./T, 'filled');
 colormap;
 a = colorbar;
-a.Label.String = "Orbital Periods"
+a.Label.String = "Orbital Periods";
 xlabel('X [km]'); ylabel('Y [km]'); zlabel('Z [km]');
 title('Two-body problem orbit');
 axis equal;
 grid on;
+
+%% Filtering (1000T)
+as = s(:,1);
+filterA = movmean(as, N/500);
+figure
+plot(tv/T, filterA)
+
+es = s(:, 2);
+filterE = movmean(es, N*2/33);
+figure
+plot(tv/T, filterE)
+
+
+
+%% Filter I
+figure
+is = s(:, 3);
+plot(tv/T, is, 'LineWidth',0.2)
+hold on
+
+
+filterI = movmean(is, N/500);
+plot(tv/T, filterI, 'Color', [1, 0, 0], 'LineWidth', 0.6)
+
+filterIs = movmean(is, N*2/33);
+plot(tv/T, filterIs, 'Color', [0, 1, 0], 'LineWidth', 1)
+title('Inclination')
+%%
+OMs = s(:, 4);
+filterOM = movmean(OMs, [0, N/500]);
+figure
+plot(tv/T, filterOM)
+
+oms = s(:, 5);
+filterom = movmean(oms, N/500);
+figure
+plot(tv/T, filterom)
+
+ths = s(:, 6);
+filterTH = movmean(ths, N/500);
+figure
+plot(tv/T, filterTH)
+
+
