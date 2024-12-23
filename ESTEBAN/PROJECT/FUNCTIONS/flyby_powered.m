@@ -5,26 +5,20 @@ vinfp = norm(vinfplus_vec);
 
 delta = acos((dot(vinfmin_vec, vinfplus_vec))/(vinfm*vinfp));
 
-%rp_test = 6378.136;
-%options = optimset('Display','off');
-%rp = fzero( @(rp) -delta + asin(1/(1 + rp/mu*vinfm^2)) + asin(1/(1 + rp/mu*vinfp^2)), rp_test, options);
-
 rp_test = 6378.136; % Initial guess
 options = optimset('Display','off');
 
-% Définit une fonction pour fzero
 fun = @(rp) -delta + asin(1/(1 + rp/mu*vinfm^2)) + asin(1/(1 + rp/mu*vinfp^2));
 
-% Vérifie si le point initial est valide
 if ~isfinite(fun(rp_test))
-    error('La valeur initiale pour fzero n’est pas valide. Vérifiez vos paramètres.');
+    error('fzero value is not valid');
 end
 
-% Résout avec fzero et gère les exceptions
+% Solver
 try
     rp = fzero(fun, rp_test, options);
 catch
-    rp = NaN; % Ou une valeur par défaut si l’erreur est tolérable
+    rp = NaN; 
 end
 
 hatm = 200;

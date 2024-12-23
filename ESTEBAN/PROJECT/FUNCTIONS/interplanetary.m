@@ -63,8 +63,7 @@ if ERROR1 == 0 && ERROR2 == 0
             dv_arr = norm(v3t' - v3f);
             dv = dv_dep + dv_fb + dv_arr;
         else
-            dv = 2000; % Supposed to be equal to NaN, put equal to 2000 to not take it in account in minimization
+            dv = NaN;
         end
 end
-
 end
