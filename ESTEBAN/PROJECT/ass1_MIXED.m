@@ -96,13 +96,9 @@ fprintf('\n\n');
 % The Hohamnn tof to go from Earth the asteroid is approximately 13 months
 % We consider the scenarios where it takes 50% to 150% of these tof 
 
-% Step size for iterating through time windows
-step = 1; % We take a step of 1 day (adaptable)
-
 % Calculate the synodic period with the most relevance
 SP = max([T_syn_dep2fb, T_syn_fb2arr, T_syn_dep2arr]) / 86400; % Synodic period in days
-SM = 0.4; % Safety margin for time of flight, 40% adjustment based on bibliography I put on Latex file
-
+SM = 0.4; % Safety margin for time of flight, 40% adjustment based on bibliography
 
 % Time of flight ranges with safety margins
 tof_t1_min = (1 - SM) * tof_t1; % Minimum time of flight Mercury -> Earth
@@ -129,18 +125,18 @@ w_arr = w_arr_min : step : w_arr_max; % Arrival window at the asteroid
 
 %% BEST SOLUTION FINDER ALGORITHMS
 %% Genetic algorithm
-lower = [w_dep(1) w_fb(1) w_arr(1)];
-upper = [w_dep(end) w_fb(end) w_arr(end)];
+lower = [w_dep(1) w_fb(1) w_arr(1)];           
+upper = [w_dep(end) w_fb(end) w_arr(end)];               
 
 lower_ga = [w_dep(1) w_fb(1) w_arr(1)];
 upper_ga = [w_dep(end) w_fb(end) w_arr(end)];
 
 % Options for genetic
 options_ga = optimoptions('ga', 'PopulationSize', 500, ...
-    'FunctionTolerance', 0.01, 'Display', 'iter', 'MaxGenerations', 200);
+    'FunctionTolerance', 0.01, 'Display', 'off', 'MaxGenerations', 200);
 
 % Solver
-N = 19; % Number of departure windows examined
+N = 1; % Number of departure windows examined
 N_ga = 5; % Number of genetic algorithm iteration to have better results
 dv_min_ga = 50; % Arbitrary chosen value of total cost
 t_opt_ga = [0, 0, 0]; % Storage value for the chosen windows
@@ -152,8 +148,7 @@ for i = 1:N
 
     for j = 1:N_ga
         [t_opt_ga_computed, dv_min_ga_computed] = ga(@(t) interplanetary(t(1),t(2),t(3)), 3, [], [], [], [], lower, upper, [], options_ga);
-        %dt = t_opt_ga_computed(3) - t_opt_ga_computed(1);
-        if dv_min_ga_computed < dv_min_ga %&& dt <= 1.5*365
+        if dv_min_ga_computed < dv_min_ga
             dv_min_ga = dv_min_ga_computed;
             t_opt_ga = t_opt_ga_computed;
             lower_ga = lower;
@@ -169,30 +164,30 @@ for i = 1:N
     lower = lower + t_ldM;
     upper = lower + t_ldM;
 end
- 
+
 % Results with ga
 date_dep_ga = mjd20002date(ceil(t_opt_ga(1)));
 date_fb_ga = mjd20002date(ceil(t_opt_ga(2)));
 date_arr_ga = mjd20002date(ceil(t_opt_ga(3)));
 
-%% Refinement with FMINCON // Gradient based optimization 
-% fmincon Configuration sqp selection
-
+%% Refinement with FMINCON
+% fmincon Configuration sqp selection options
 options_fmincon = optimoptions('fmincon','Display', 'iter-detailed', 'Algorithm', 'sqp','StepTolerance', 1e-10, 'OptimalityTolerance', 1e-6);
 
+% Fmincon solver
 fprintf('Refining Solution with FMINCON...\n');
 [t_refined, dv_min_refined] = fmincon(@(t) interplanetary(t(1), t(2), t(3)),  t_opt_ga, [], [], [], [], lower_ga, upper_ga, [], options_fmincon);
 
 % Convert refined dates to Gregorian format
-date_dep_ref = mjd20002date(t_refined(1)); % Departure date
-date_fb_ref = mjd20002date(t_refined(2)); % Flyby date
-date_arr_ref = mjd20002date(t_refined(3)); % Arrival date
+date_dep_ref = mjd20002date(t_refined(1));
+date_fb_ref = mjd20002date(t_refined(2));
+date_arr_ref = mjd20002date(t_refined(3));
 
 %% Gradient refining method
 % Options for gradient
 options_grad = optimoptions('fminunc', 'TolFun', 1e-6, 'TolX', 1e-6, 'MaxFunEvals', 1e4, 'MaxIter', 1e4, 'Display', 'off', 'Algorithm', 'quasi-newton'); 
 
-% Solver
+% Gradient solver
 [t_opt_grad, dv_min_grad] = fminunc(@(t) interplanetary(t(1), t(2), t(3)), t_opt_ga, options_grad);
 
 % Results with gradient
@@ -206,9 +201,9 @@ options_sa = optimoptions('simulannealbnd', 'MaxIterations', 2000,'Display', 'it
 
 [t_refined_sa, dv_min_sa] = simulannealbnd(@(t) interplanetary(t(1), t(2), t(3)), t_opt_ga, lower_ga, upper_ga, options_sa);
 
-date_dep_sa = mjd20002date(t_refined_sa(1)); % Departure date
-date_fb_sa = mjd20002date(t_refined_sa(2)); % Flyby date
-date_arr_sa = mjd20002date(t_refined_sa(3)); % Arrival date
+date_dep_sa = mjd20002date(t_refined_sa(1));
+date_fb_sa = mjd20002date(t_refined_sa(2));
+date_arr_sa = mjd20002date(t_refined_sa(3));
 
 %% Algorithm comparison
 % Genetic Algorithm

@@ -96,27 +96,48 @@ fprintf('\n\n');
 % The Hohamnn tof to go from Earth the asteroid is approximately 13 months
 % We consider the scenarios where it takes 50% to 150% of these tof 
 
-dt_windows = 1.5*365.25; % Duration of the first window with respect to the synodic periods (1.5 years) [days]
-step = 1; % We take a step of 1 day (adaptable)
+% Calculate the synodic period with the most relevance
+SP = max([T_syn_dep2fb, T_syn_fb2arr, T_syn_dep2arr]) / 86400; % Synodic period in days
+SM = 0.4; % Safety margin for time of flight, 40% adjustment based on bibliography
 
-w_dep = mdj_dep : step : mdj_dep + dt_windows; % First departure window from Mercury
-w_fb = w_dep(1) + 1/3*tof_t1 : step : w_dep(end) + 2/3*tof_t1; % First arrival window on Earth
-w_arr = w_fb(1) + 1/3*tof_t2 : step : w_fb(end) + 2/3*tof_t2; % First arrival window on the asteroid
+% Time of flight ranges with safety margins
+tof_t1_min = (1 - SM) * tof_t1; % Minimum time of flight Mercury -> Earth
+tof_t1_max = (1 + SM) * tof_t1; % Maximum time of flight Mercury -> Earth
 
-% We now consider that we should find an optimal solution between t_dep(1) and t_arr(end)
+tof_t2_min = (1 - SM) * tof_t2; % Minimum time of flight Earth -> Asteroid
+tof_t2_max = (1 + SM) * tof_t2; % Maximum time of flight Earth -> Asteroid
+
+% Calculate the last possible departure time from Mercury
+t_ldM = SP - tof_t1_min; % Last departure from Mercury to arrive within the synodic period
+
+% Define the departure window from Mercury
+w_dep = mdj_dep : step : mdj_dep + t_ldM; % First departure window from Mercury
+
+% Calculate the arrival window at Earth
+w_fb_min = w_dep(1) + tof_t1_min; % Earliest arrival at Earth
+w_fb_max = w_dep(end) + tof_t1_max; % Latest arrival at Earth
+w_fb = w_fb_min : step : w_fb_max; % Arrival window at Earth
+
+% Calculate the departure window from Earth to the asteroid
+w_arr_min = w_fb(1) + tof_t2_min; % Earliest departure from Earth to the asteroid
+w_arr_max = w_fb(end) + tof_t2_max; % Ensure compatibility with the synodic period
+w_arr = w_arr_min : step : w_arr_max; % Arrival window at the asteroid
 
 %% BEST SOLUTION FINDER ALGORITHMS
 %% Genetic algorithm
 lower = [w_dep(1) w_fb(1) w_arr(1)];           
 upper = [w_dep(end) w_fb(end) w_arr(end)];               
 
+lower_ga = [w_dep(1) w_fb(1) w_arr(1)];
+upper_ga = [w_dep(end) w_fb(end) w_arr(end)];
+
 % Options for genetic
 options_ga = optimoptions('ga', 'PopulationSize', 500, ...
     'FunctionTolerance', 0.01, 'Display', 'off', 'MaxGenerations', 200);
 
 % Solver
-N = 19; % Number of departure windows examined
-N_ga = 3; % Number of genetic algorithm iteration to have better results
+N = 1; % Number of departure windows examined
+N_ga = 5; % Number of genetic algorithm iteration to have better results
 dv_min_ga = 50; % Arbitrary chosen value of total cost
 t_opt_ga = [0, 0, 0]; % Storage value for the chosen windows
 
@@ -131,6 +152,8 @@ for i = 1:N
         if dv_min_ga_computed < dv_min_ga %&& dt <= 1.5*365
             dv_min_ga = dv_min_ga_computed;
             t_opt_ga = t_opt_ga_computed;
+            lower_ga = lower;
+            upper_ga = upper;
         end
         elapsedTime = toc(startTime);
         fprintf('Elapsed time : \n\n');
@@ -139,29 +162,14 @@ for i = 1:N
         fprintf('\n\n');
     end
 
-    lower = lower + dt_windows;
-    upper = lower + dt_windows;
+    lower = lower + t_ldM;
+    upper = lower + t_ldM;
 end
 
 % Results with ga
 date_dep_ga = mjd20002date(ceil(t_opt_ga(1)));
 date_fb_ga = mjd20002date(ceil(t_opt_ga(2)));
-date_arr_ga = mjd20002date(ceil(t_opt_ga(3)));z
-
-dep_ga = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
-    date_dep_ga(2), date_dep_ga(3), date_dep_ga(1), date_dep_ga(4), date_dep_ga(5), date_dep_ga(6));
-fb_ga = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
-    date_fb_ga(2), date_fb_ga(3), date_fb_ga(1), date_fb_ga(4), date_fb_ga(5), date_fb_ga(6));
-arr_ga = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
-    date_arr_ga(2), date_arr_ga(3), date_arr_ga(1), date_arr_ga(4), date_arr_ga(5), date_arr_ga(6));
-
-% Print  results with ga
-fprintf('Optmised results with ga :\n\n');
-fprintf('Departure date : %s \n', dep_ga);
-fprintf('Fly-by date: %s \n', fb_ga);
-fprintf('Arrival date : %s \n', arr_ga);
-fprintf('Total optimised cost (dv) : %f km/s \n', dv_min_ga);
-fprintf('\n\n');
+date_arr_ga = mjd20002date(ceil(t_opt_ga(3)));
 
 %% Gradient refining method
 % Options for gradient
@@ -173,7 +181,7 @@ options_grad = optimoptions('fminunc', 'TolFun', 1e-6, 'TolX', 1e-6, 'MaxFunEval
 % Results with gradient
 date_dep_grad = mjd20002date(ceil(t_opt_grad(1)));
 date_fb_grad = mjd20002date(ceil(t_opt_grad(2)));
-date_arr_ga = mjd20002date(ceil(t_opt_grad(3)));
+date_arr_grad = mjd20002date(ceil(t_opt_grad(3)));
 
 dep_grad = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
     date_dep_grad(2), date_dep_grad(3), date_dep_grad(1), date_dep_grad(4), date_dep_grad(5), date_dep_grad(6));
