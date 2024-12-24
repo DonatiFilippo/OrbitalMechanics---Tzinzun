@@ -30,8 +30,8 @@ fprintf('\n');
 Departure_date = [2030, 1, 1, 0, 0, 0]; % Earliest departure date [Gregorian date]
 Arrival_date = [2060, 1, 1, 0, 0, 0]; % Latest arrival date [Gregorian date]
  
-mdj_dep = date2mjd2000(Departure_date); % Earliest departure date converted to modified Julian day 2000
-mdj_arr = date2mjd2000(Arrival_date); % Latest arrival date converted to modified Julian day 2000
+mjd_dep = date2mjd2000(Departure_date); % Earliest departure date converted to modified Julian day 2000
+mjd_arr = date2mjd2000(Arrival_date); % Latest arrival date converted to modified Julian day 2000
 
 %% PHYSICAL PARAMETERS
 Departure_planet = 1; % Mercury as the departure planet 
@@ -94,7 +94,9 @@ fprintf('\n\n');
 % Recall : the synodic period of Earth wrt the asteroid is 1.5 years
 % The Hohamnn tof to go from Mercury to Earth is approximately 4 months
 % The Hohamnn tof to go from Earth the asteroid is approximately 13 months
-% We consider the scenarios where it takes 50% to 150% of these tof 
+
+% Step size for iterating through time windows
+step = 1; % We take a step of 1 day (adaptable)
 
 % Calculate the synodic period with the most relevance
 SP = max([T_syn_dep2fb, T_syn_fb2arr, T_syn_dep2arr]) / 86400; % Synodic period in days
@@ -110,8 +112,9 @@ tof_t2_max = (1 + SM) * tof_t2; % Maximum time of flight Earth -> Asteroid
 % Calculate the last possible departure time from Mercury
 t_ldM = SP - tof_t1_min; % Last departure from Mercury to arrive within the synodic period
 
+
 % Define the departure window from Mercury
-w_dep = mdj_dep : step : mdj_dep + t_ldM; % First departure window from Mercury
+w_dep = mjd_dep : step : mjd_dep + t_ldM; % First departure window from Mercury
 
 % Calculate the arrival window at Earth
 w_fb_min = w_dep(1) + tof_t1_min; % Earliest arrival at Earth
@@ -132,11 +135,11 @@ lower_ga = [w_dep(1) w_fb(1) w_arr(1)];
 upper_ga = [w_dep(end) w_fb(end) w_arr(end)];
 
 % Options for genetic
-options_ga = optimoptions('ga', 'PopulationSize', 500, ...
-    'FunctionTolerance', 0.01, 'Display', 'off', 'MaxGenerations', 200);
+options_ga = optimoptions('ga', 'PopulationSize', 1000, ...
+    'FunctionTolerance', 0.01, 'Display', 'off', 'MaxGenerations', 1000);
 
-% Solver
-N = 1; % Number of departure windows examined
+N = ceil((mjd_arr-w_arr_max)/365.25); 
+% Solver% Number of departure windows examined
 N_ga = 5; % Number of genetic algorithm iteration to have better results
 dv_min_ga = 50; % Arbitrary chosen value of total cost
 t_opt_ga = [0, 0, 0]; % Storage value for the chosen windows
@@ -148,12 +151,13 @@ for i = 1:N
 
     for j = 1:N_ga
         [t_opt_ga_computed, dv_min_ga_computed] = ga(@(t) interplanetary(t(1),t(2),t(3)), 3, [], [], [], [], lower, upper, [], options_ga);
-        if dv_min_ga_computed < dv_min_ga
+        if dv_min_ga_computed < dv_min_ga && t_opt_ga_computed(3) < mjd_arr
             dv_min_ga = dv_min_ga_computed;
             t_opt_ga = t_opt_ga_computed;
             lower_ga = lower;
             upper_ga = upper;
         end
+
         elapsedTime = toc(startTime);
         fprintf('Elapsed time : \n\n');
         fprintf('\n\n\n\n\n\n\n\n');
@@ -166,9 +170,9 @@ for i = 1:N
 end
 
 % Results with ga
-date_dep_ga = mjd20002date(ceil(t_opt_ga(1)));
-date_fb_ga = mjd20002date(ceil(t_opt_ga(2)));
-date_arr_ga = mjd20002date(ceil(t_opt_ga(3)));
+date_dep_ga = mjd20002date(t_opt_ga(1));
+date_fb_ga = mjd20002date(t_opt_ga(2));
+date_arr_ga = mjd20002date(t_opt_ga(3));
 
 %% Refinement with FMINCON
 % fmincon Configuration sqp selection options
@@ -176,24 +180,24 @@ options_fmincon = optimoptions('fmincon','Display', 'iter-detailed', 'Algorithm'
 
 % Fmincon solver
 fprintf('Refining Solution with FMINCON...\n');
-[t_refined, dv_min_refined] = fmincon(@(t) interplanetary(t(1), t(2), t(3)),  t_opt_ga, [], [], [], [], lower_ga, upper_ga, [], options_fmincon);
+[t_refined_fmin, dv_min_fmin] = fmincon(@(t) interplanetary(t(1), t(2), t(3)),  t_opt_ga, [], [], [], [], lower_ga, upper_ga, [], options_fmincon);
 
 % Convert refined dates to Gregorian format
-date_dep_ref = mjd20002date(t_refined(1));
-date_fb_ref = mjd20002date(t_refined(2));
-date_arr_ref = mjd20002date(t_refined(3));
+date_dep_ref = mjd20002date(t_refined_fmin(1));
+date_fb_ref = mjd20002date(t_refined_fmin(2));
+date_arr_ref = mjd20002date(t_refined_fmin(3));
 
 %% Gradient refining method
 % Options for gradient
 options_grad = optimoptions('fminunc', 'TolFun', 1e-6, 'TolX', 1e-6, 'MaxFunEvals', 1e4, 'MaxIter', 1e4, 'Display', 'off', 'Algorithm', 'quasi-newton'); 
 
 % Gradient solver
-[t_opt_grad, dv_min_grad] = fminunc(@(t) interplanetary(t(1), t(2), t(3)), t_opt_ga, options_grad);
+[t_refined_grad, dv_min_grad] = fminunc(@(t) interplanetary(t(1), t(2), t(3)), t_opt_ga, options_grad);
 
 % Results with gradient
-date_dep_grad = mjd20002date(ceil(t_opt_grad(1)));
-date_fb_grad = mjd20002date(ceil(t_opt_grad(2)));
-date_arr_grad = mjd20002date(ceil(t_opt_grad(3)));
+date_dep_grad = mjd20002date(t_refined_grad(1));
+date_fb_grad = mjd20002date(t_refined_grad(2));
+date_arr_grad = mjd20002date(t_refined_grad(3));
 
 %% Refinamiento Simulated Annealing
 
@@ -220,7 +224,7 @@ fprintf('FMINCON/Local Refinement Results:\n\n');
 fprintf('Departure: %02d/%02d/%04d\n', date_dep_ref(3), date_dep_ref(2), date_dep_ref(1));
 fprintf('Flyby: %02d/%02d/%04d\n', date_fb_ref(3), date_fb_ref(2), date_fb_ref(1));
 fprintf('Arrival: %02d/%02d/%04d\n', date_arr_ref(3), date_arr_ref(2), date_arr_ref(1));
-fprintf('Delta-v: %.2f km/s\n', dv_min_refined);
+fprintf('Delta-v: %.2f km/s\n', dv_min_fmin);
 fprintf('\n\n')
 
 % Refined solution with gradient
@@ -239,24 +243,41 @@ fprintf('Arrival: %02d/%02d/%04d \n', date_arr_sa(3), date_arr_sa(2), date_arr_s
 fprintf('Delta-v: %.2f km/s\n', dv_min_sa);
 fprintf('\n\n')
 
+%% Choice of the best solution
+dv_min_sol_inter = min(dv_min_fmin, dv_min_grad);
+dv_min_sol = min(dv_min_sol_inter, dv_min_sa);
+
+if dv_min_sol == dv_min_fmin
+    t_opt_sol = t_refined_fmin;
+elseif dv_min_sol == dv_min_grad
+    t_opt_sol = t_refined_grad;
+elseif dv_min_sol == dv_min_sa
+    t_opt_sol = t_refined_sa;
+end
+
+date_dep_sol = mjd20002date(t_opt_sol(1));
+date_fb_sol = mjd20002date(t_opt_sol(2));
+date_arr_sol = mjd20002date(t_opt_sol(3));
+
 %% PLOT RESULTS
 %% Results 
-[dv_opt, dv_dep, dv_arr, r1, v1i, r2, v2f, r3, v3f, v1t, v2t, v2t_1, v3t, vinfmin_vec, vinfplus_vec] = interplanetary(t_opt_grad(1), t_opt_grad(2), t_opt_grad(3));
+[dv_opt, dv_dep, dv_arr, r1, v1i, r2, v2f, r3, v3f, v1t, v2t, v2t_1, v3t, vinfmin_vec, vinfplus_vec] = interplanetary(t_refined_grad(1), t_refined_grad(2), t_refined_grad(3));
 [vinfm, vinfp, delta, rp, am, ap, em, ep, vpm, vpp, deltam, deltap, dv_fb_tot, dv_fb_pow] = flyby_powered(vinfmin_vec, vinfplus_vec, muE);
 
-%fprintf('The final solution is :\n\n');
-%fprintf('Departure date : %s \n', dep_date_grad);
-%fprintf('Fly-by date: %s \n', fb_date_grad);
-%fprintf('Arrival date : %s \n', arr_date_grad);
-%fprintf('\n\n');
+fprintf('The final solutions are :\n\n');
+fprintf('Departure: %02d/%02d/%04d \n', date_dep_sol(3), date_dep_sol(2), date_dep_sol(1));
+fprintf('Flyby: %02d/%02d/%04d \n', date_fb_sol(3), date_fb_sol(2), date_fb_sol(1));
+fprintf('Arrival: %02d/%02d/%04d \n', date_arr_sol(3), date_arr_sol(2), date_arr_sol(1));
+fprintf('Delta-v: %.2f km/s\n', dv_min_sol);
+fprintf('\n\n');
 
 %% Heliocentric trajectory
 % Initialisation
 N_t = 50000;
 
-t_dep = t_opt_grad(1) * 86400;
-t_fb = t_opt_grad(2) * 86400;
-t_arr = t_opt_grad(3) * 86400;
+t_dep = t_refined_grad(1) * 86400;
+t_fb = t_refined_grad(2) * 86400;
+t_arr = t_refined_grad(3) * 86400;
 
 dt_leg1 = t_fb - t_dep;
 dt_leg2 = t_arr - t_fb;
@@ -305,10 +326,7 @@ hold off;
 
 %% Fly-by trajectory (planetocentric)
 % Results
-IPm = -am*em*cos(deltam); % Impact paramater for incoming hyperbolic trajectory
-IPp = -ap*ep*cos(deltap); % Impact paramater for outgoing hyperbolic trajectory
-
-CA = min(IPm, IPp); % Altitude of the closest approach
+CA = rp - Re; % Altitude of closest approach
 
 fprintf('The altitude of the closest approach is : %f km \n\n', CA);
 
@@ -350,15 +368,16 @@ y0p = [r0; vp];
 figure();
 hold on;
 
-plot(Y_fb_min(:, 1) / Re, Y_fb_min(:, 2) / Re, 'b-', 'LineWidth', 1.5, 'DisplayName', 'Flyby hyperbola (infront)');
-plot(Y_fb_plus(:, 1) / Re, Y_fb_plus(:, 2) / Re, 'b-', 'LineWidth', 1.5);
-plot(0, 0, 'yo', 'MarkerSize', 15, 'MarkerFaceColor', 'blue', 'DisplayName', 'Earth');
+plot3(Y_fb_min(:, 1) / Re, Y_fb_min(:, 2) / Re, Y_fb_min(:, 3) / Re, 'm-', 'LineWidth', 1.5, 'DisplayName', 'Flyby hyperbola (infront)');
+plot3(Y_fb_plus(:, 1) / Re, Y_fb_plus(:, 2) / Re, Y_fb_plus(:, 3) / Re, 'g-', 'LineWidth', 1.5);
+plot(0, 0, 'yo', 'MarkerSize', 15, 'MarkerFaceColor', 'blue');
 
 xlabel('x [Re]');
 ylabel('y [Re]');
 title('Trajectory in Earth-centred frame parallel to (HECI)');
 axis equal;
 grid on;
+legend("Fly-by trajectory", "Earth");
 
-xlim([-6, 9]);
-ylim([-9, 3]);
+xlim([-10, 10]);
+ylim([-10, 10]);

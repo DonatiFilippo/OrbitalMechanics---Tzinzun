@@ -52,8 +52,8 @@ catch
     rp = NaN; 
 end
 
-hatm = 200;
-rp_critical = 6378.136 + hatm;
+h_condition = 800;
+rp_critical = 6378.136 + h_condition;
 
 if rp > rp_critical
     am = -mu/vinfm^2;
