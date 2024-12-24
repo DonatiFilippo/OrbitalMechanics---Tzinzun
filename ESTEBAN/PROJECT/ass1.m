@@ -142,24 +142,24 @@ for i = 1:N
     lower = lower + dt_windows;
     upper = lower + dt_windows;
 end
- 
-% Results with ga
-dep_grad = mjd20002date(ceil(t_opt_ga(1)));
-fb_grad = mjd20002date(ceil(t_opt_ga(2)));
-arr_grad = mjd20002date(ceil(t_opt_ga(3)));
 
-dep_date_ga = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
-    dep_grad(2), dep_grad(3), dep_grad(1), dep_grad(4), dep_grad(5), dep_grad(6));
-fb_date_ga = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
-    fb_grad(2), fb_grad(3), fb_grad(1), fb_grad(4), fb_grad(5), fb_grad(6));
-arr_date_ga = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
-    arr_grad(2), arr_grad(3), arr_grad(1), arr_grad(4), arr_grad(5), arr_grad(6));
+% Results with ga
+date_dep_ga = mjd20002date(ceil(t_opt_ga(1)));
+date_fb_ga = mjd20002date(ceil(t_opt_ga(2)));
+date_arr_ga = mjd20002date(ceil(t_opt_ga(3)));z
+
+dep_ga = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
+    date_dep_ga(2), date_dep_ga(3), date_dep_ga(1), date_dep_ga(4), date_dep_ga(5), date_dep_ga(6));
+fb_ga = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
+    date_fb_ga(2), date_fb_ga(3), date_fb_ga(1), date_fb_ga(4), date_fb_ga(5), date_fb_ga(6));
+arr_ga = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
+    date_arr_ga(2), date_arr_ga(3), date_arr_ga(1), date_arr_ga(4), date_arr_ga(5), date_arr_ga(6));
 
 % Print  results with ga
 fprintf('Optmised results with ga :\n\n');
-fprintf('Departure date : %s \n', dep_date_ga);
-fprintf('Fly-by date: %s \n', fb_date_ga);
-fprintf('Arrival date : %s \n', arr_date_ga);
+fprintf('Departure date : %s \n', dep_ga);
+fprintf('Fly-by date: %s \n', fb_ga);
+fprintf('Arrival date : %s \n', arr_ga);
 fprintf('Total optimised cost (dv) : %f km/s \n', dv_min_ga);
 fprintf('\n\n');
 
@@ -171,25 +171,29 @@ options_grad = optimoptions('fminunc', 'TolFun', 1e-6, 'TolX', 1e-6, 'MaxFunEval
 [t_opt_grad, dv_min_grad] = fminunc(@(t) interplanetary(t(1), t(2), t(3)), t_opt_ga, options_grad);
 
 % Results with gradient
-dep_grad = mjd20002date(ceil(t_opt_grad(1)));
-fb_grad = mjd20002date(ceil(t_opt_grad(2)));
-arr_grad = mjd20002date(ceil(t_opt_grad(3)));
+date_dep_grad = mjd20002date(ceil(t_opt_grad(1)));
+date_fb_grad = mjd20002date(ceil(t_opt_grad(2)));
+date_arr_grad = mjd20002date(ceil(t_opt_grad(3)));
 
-dep_date_grad = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
-    dep_grad(2), dep_grad(3), dep_grad(1), dep_grad(4), dep_grad(5), dep_grad(6));
-fb_date_grad = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
-    fb_grad(2), fb_grad(3), fb_grad(1), fb_grad(4), fb_grad(5), fb_grad(6));
-arr_date_grad = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
-    arr_grad(2), arr_grad(3), arr_grad(1), arr_grad(4), arr_grad(5), arr_grad(6));
+dep_grad = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
+    date_dep_grad(2), date_dep_grad(3), date_dep_grad(1), date_dep_grad(4), date_dep_grad(5), date_dep_grad(6));
+fb_grad = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
+    date_fb_grad(2), date_fb_grad(3), date_fb_grad(1), date_fb_grad(4), date_fb_grad(5), date_fb_grad(6));
+arr_grad = sprintf('%02d/%02d/%04d %02d:%02d:%02d', ...
+    date_arr_grad(2), date_arr_grad(3), date_arr_grad(1), date_arr_grad(4), date_arr_grad(5), date_arr_grad(6));
 
 disp(t_opt_grad);
+
 % Print refined solution with gradient
 fprintf('Refined solution with gradient :\n\n');
-fprintf('Departure date : %s \n', dep_date_grad);
-fprintf('Fly-by date: %s \n', fb_date_grad);
-fprintf('Arrival date : %s \n', arr_date_grad);
+fprintf('Departure date : %s \n', dep_grad);
+fprintf('Fly-by date: %s \n', fb_grad);
+fprintf('Arrival date : %s \n', arr_grad);
 fprintf('Minimised cost with gradient : %f km/s \n', dv_min_grad);
 fprintf('\n\n');
+
+lower = [w_dep(1) w_fb(1) w_arr(1)];           
+upper = [w_dep(end) w_fb(end) w_arr(end)]; 
 
 %% PLOT RESULTS
 %% Results 
