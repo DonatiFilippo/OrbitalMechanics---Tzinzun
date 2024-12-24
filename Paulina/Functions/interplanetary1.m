@@ -1,4 +1,4 @@
-function dv = interplanetary (t1, t2, t3)
+function [dv, dv_dep, dv_arr, r1, v1i, r2, v2f, r3, v3f, v1t, v2t, v2t_1, v3t, vinfmin_vec, vinfplus_vec] = interplanetary (t1, t2, t3, N_ga)
 %% FUNCTION DESCRIPTION
 %
 %--------------------------------------------------------------------------
@@ -49,7 +49,7 @@ dt2 = (t3 - t2)*86400;
 %% Solver
 % Transfer leg 1
 best_dv = inf; % Initialize the best delta-v
-Nrev_max = 3; % Maximum number of revolutions to consider
+Nrev_max = N_ga; % Maximum number of revolutions to consider
 for Nrev = 0:Nrev_max
     % Lambert arc from departure to flyby
     [~, ~, ~, ERROR1, v1t, v2t, ~, ~] = lambertMR(r1, r2, dt1, muS, 0, Nrev, 0, 0);
@@ -61,7 +61,7 @@ for Nrev = 0:Nrev_max
         % Compute flyby parameters
         vinfmin_vec = v2t' - v2f; % Incoming hyperbolic excess velocity
         vinfplus_vec = v2t_1' - v2f; % Outgoing hyperbolic excess velocity
-        [~, ~, ~, rp_fb, ~, ~, ~, ~, ~, ~, ~, ~, dv_fb, ~] = flyby_powered(vinfmin_vec, vinfplus_vec, muE);
+        [~, ~, ~, rp_fb, ~, ~, ~, ~, ~, ~, ~, ~,  ~, dv_fb] = flyby_powered(vinfmin_vec, vinfplus_vec, muE);
 
         % Check if flyby radius is feasible
         if ~isnan(rp_fb)
