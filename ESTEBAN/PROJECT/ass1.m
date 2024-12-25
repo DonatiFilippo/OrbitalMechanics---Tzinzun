@@ -135,11 +135,11 @@ lower_ga = [w_dep(1) w_fb(1) w_arr(1)];
 upper_ga = [w_dep(end) w_fb(end) w_arr(end)];
 
 % Options for genetic
-options_ga = optimoptions('ga', 'PopulationSize', 1000, ...
-    'FunctionTolerance', 0.01, 'Display', 'off', 'MaxGenerations', 1000);
-
-N = ceil((mjd_arr-w_arr_max)/365.25); 
-% Solver% Number of departure windows examined
+options_ga = optimoptions('ga', 'PopulationSize', 300, ...
+    'FunctionTolerance', 0.01, 'Display', 'off', 'MaxGenerations', 200);
+ 
+% Solver
+N = ceil((mjd_arr-w_arr_max)/365.25);
 N_ga = 5; % Number of genetic algorithm iteration to have better results
 dv_min_ga = 50; % Arbitrary chosen value of total cost
 t_opt_ga = [0, 0, 0]; % Storage value for the chosen windows
