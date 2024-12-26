@@ -9,9 +9,9 @@ else
 end
 
 if planet2 <= 10
-    [kep2,~] = uplanet(t1, planet1);
+    [kep2,~] = uplanet(t2, planet2);
 else
-    [kep2,~] = ephAsteroids(t1, planet1);
+    [kep2,~] = ephAsteroids(t2, planet2);
 end
 
 muS = astroConstants(4);
