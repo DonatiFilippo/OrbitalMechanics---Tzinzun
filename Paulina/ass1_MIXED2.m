@@ -130,56 +130,6 @@ w_arr_max = w_fb(end) + tof_t2_max; % Ensure compatibility with the synodic peri
 w_arr = w_arr_min : step : w_arr_max; % Arrival window at the asteroid
 
 
-%% Porkchop patches
-
-days = 200;
-dep_dates_1 = mdj_dep:days:(mdj_dep + t_ldM); % Fechas de salida para Mercury → Earth
-arr_dates_1 = w_fb_min:days:w_fb_max;        % Fechas de llegada para Mercury → Earth
-dep_dates_2 = w_arr_min:days:w_arr_max;      % Fechas de salida para Earth → Asteroid
-arr_dates_2 = (mdj_arr - tof_t2_max):days:mdj_arr; % Fechas de llegada para Earth → Asteroid
-
-
-% Cálculo de los deltas-v
-[delta_v1, delta_v2] = porkchop(dep_dates_1, arr_dates_1, dep_dates_2, arr_dates_2);
-
-
-[X1, Y1] = meshgrid(arr_dates_1, dep_dates_1); % Para delta_v1
-[X2, Y2] = meshgrid(arr_dates_2, dep_dates_2); % Para delta_v2
-
-
-figure()
-hold on
-grid on
-title('Pork chop plot contour from Mercury to Earth')
-xlabel('Time of arrival [MJD2000]')
-ylabel('Time of departure [MJD2000]')
-contour(X1, Y1, delta_v1, 50); % Usa la malla y matriz correspondientes
-colorbar
-colormap jet
-datetick('x', 'dd/mm/yyyy', 'keepticks', 'keeplimits')
-datetick('y', 'dd/mm/yyyy', 'keepticks', 'keeplimits')
-set(gca, 'XTickLabelRotation', 45)
-set(gca, 'YTickLabelRotation', 45)
-hold off
-
-figure()
-hold on
-grid on
-title('Pork chop plot contour from Earth to Asteroid')
-xlabel('Time of arrival [MJD2000]')
-ylabel('Time of departure [MJD2000]')
-contour(X2, Y2, delta_v2, 50);
-colorbar
-colormap jet
-datetick('x', 'dd/mm/yyyy', 'keepticks', 'keeplimits')
-datetick('y', 'dd/mm/yyyy', 'keepticks', 'keeplimits')
-set(gca, 'XTickLabelRotation', 45)
-set(gca, 'YTickLabelRotation', 45)
-hold off
-
-
-
-
 %% BEST SOLUTION FINDER ALGORITHMS
 %% Genetic algorithm
 lower = [w_dep(1) w_fb(1) w_arr(1)];           
@@ -295,4 +245,54 @@ fprintf('Flyby: %02d/%02d/%04d \n', date_fb_sa(3), date_fb_sa(2), date_fb_sa(1))
 fprintf('Arrival: %02d/%02d/%04d \n', date_arr_sa(3), date_arr_sa(2), date_arr_sa(1));
 fprintf('Delta-v: %.2f km/s\n', dv_min_sa);
 fprintf('\n\n')
+
+%% Porkchop patches
+
+%days = 25;
+days = 45;
+dep_dates_1 = mjd_dep:days:(mjd_dep + t_ldM); % Fechas de salida para Mercury → Earth
+arr_dates_1 = w_fb_min:days:w_fb_max;        % Fechas de llegada para Mercury → Earth
+dep_dates_2 = w_fb_min:days:w_fb_max;      % Fechas de salida para Earth → Asteroid
+arr_dates_2 = w_arr_min:days:w_arr_max; % Fechas de llegada para Earth → Asteroid
+
+
+% Cálculo de los deltas-v
+[delta_v1, delta_v2] = porkchop(dep_dates_1, arr_dates_1, dep_dates_2, arr_dates_2);
+
+
+[X1, Y1] = meshgrid(arr_dates_1, dep_dates_1); % Para delta_v1
+[X2, Y2] = meshgrid(arr_dates_2, dep_dates_2); % Para delta_v2
+
+
+figure()
+hold on
+grid on
+title('Pork chop plot contour from Mercury to Earth')
+xlabel('Time of arrival [MJD2000]')
+ylabel('Time of departure [MJD2000]')
+contour(X1, Y1, delta_v1, 50); % Usa la malla y matriz correspondientes
+colorbar
+colormap jet
+datetick('x', 'dd/mm/yyyy', 'keepticks', 'keeplimits')
+datetick('y', 'dd/mm/yyyy', 'keepticks', 'keeplimits')
+set(gca, 'XTickLabelRotation', 45)
+set(gca, 'YTickLabelRotation', 45)
+hold off
+
+figure()
+hold on
+grid on
+title('Pork chop plot contour from Earth to Asteroid')
+xlabel('Time of arrival [MJD2000]')
+ylabel('Time of departure [MJD2000]')
+contour(X2, Y2, delta_v2, 50);
+colorbar
+colormap jet
+datetick('x', 'dd/mm/yyyy', 'keepticks', 'keeplimits')
+datetick('y', 'dd/mm/yyyy', 'keepticks', 'keeplimits')
+set(gca, 'XTickLabelRotation', 45)
+set(gca, 'YTickLabelRotation', 45)
+hold off
+
+
 
