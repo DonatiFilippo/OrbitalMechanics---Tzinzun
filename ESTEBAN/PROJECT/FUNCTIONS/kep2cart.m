@@ -1,4 +1,4 @@
-function [r_vect,v_vect] = kep2cart (a,e,i,OM,om,th,mu)
+function [r_vect,v_vect] = kep2cart(varargin)
 %
 % Converter: Keplerian Parameters ---> Cartesian Coordinates & Velocities
 %
@@ -21,6 +21,44 @@ function [r_vect,v_vect] = kep2cart (a,e,i,OM,om,th,mu)
 %   v_vect     [3x1]       Velocity Vector           [km/s]
 %--------------------------------------------------------------------------
 %
+if nargin == 1
+    % Formato: kep2cart(kep)
+    if isvector(varargin{1})
+        Kep = varargin{1};
+        a = Kep(1);
+        e = Kep(2);
+        i = Kep(3);
+        OM = Kep(4);
+        om = Kep(5);
+        th = Kep(6);
+        mu = 398600; % Valor por defecto para la Tierra [km^3/s^2]
+    end
+
+elseif nargin == 2
+    % Formato: kep2cart(kep, mu)
+    if isvector(varargin{1}) && isscalar(varargin{2})
+        Kep = varargin{1};
+        a = Kep(1);
+        e = Kep(2);
+        i = Kep(3);
+        OM = Kep(4);
+        om = Kep(5);
+        th = Kep(6);
+        mu = varargin{2};
+    end
+
+elseif nargin == 7
+    % Formato: kep2cart(kep1(1), kep1(2), ..., kep1(6), mu)
+    a = varargin{1};
+    e = varargin{2};
+    i = varargin{3};
+    OM = varargin{4};
+    om = varargin{5};
+    th = varargin{6};
+    mu = varargin{7};
+    end
+
+
 %% Conversion Routine
 %Semi-Latus Rectum
 p = a*(1-e.^2);
