@@ -139,8 +139,9 @@ options_ga = optimoptions('ga', 'PopulationSize', 300, ...
     'FunctionTolerance', 0.01, 'Display', 'off', 'MaxGenerations', 200);
  
 % Solver
-N = ceil((mjd_arr-w_arr_max)/365.25);
-N_ga = 5; % Number of genetic algorithm iteration to have better results
+N = 1;
+% N = ceil((mjd_arr-w_arr_max)/365.25);
+N_ga = 3; % Number of genetic algorithm iteration to have better results
 dv_min_ga = 50; % Arbitrary chosen value of total cost
 t_opt_ga = [0, 0, 0]; % Storage value for the chosen windows
 
@@ -305,7 +306,7 @@ y_ast = [ r3; v3f ];
 [ t5, Y_ast] = ode113(@(t,y) ode_2bp(t,y,muS), tspan_asteroid, y_ast, options);
 
 % Plot
-n = 1.496e+8;
+n = astroConstants(2);
 
 figure();
 plot3(Y_mercury(:,1)/n, Y_mercury(:,2)/n,  Y_mercury(:,3)/n, 'b-', 'LineWidth', 1);
@@ -370,14 +371,16 @@ hold on;
 
 plot3(Y_fb_min(:, 1) / Re, Y_fb_min(:, 2) / Re, Y_fb_min(:, 3) / Re, 'm-', 'LineWidth', 1.5, 'DisplayName', 'Flyby hyperbola (infront)');
 plot3(Y_fb_plus(:, 1) / Re, Y_fb_plus(:, 2) / Re, Y_fb_plus(:, 3) / Re, 'g-', 'LineWidth', 1.5);
-plot(0, 0, 'yo', 'MarkerSize', 15, 'MarkerFaceColor', 'blue');
+plot3(0, 0, 0, 'yo', 'MarkerSize', 15, 'MarkerFaceColor', 'blue');
+view(3);
 
 xlabel('x [Re]');
 ylabel('y [Re]');
+zlabel('z [Re]');
 title('Trajectory in Earth-centred frame parallel to (HECI)');
 axis equal;
 grid on;
-legend("Fly-by trajectory", "Earth");
 
 xlim([-10, 10]);
 ylim([-10, 10]);
+zlim([-10, 10]);
