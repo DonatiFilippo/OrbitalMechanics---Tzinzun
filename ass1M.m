@@ -334,12 +334,18 @@ y_ast     = [ r3; v3f ];
 n = astroConstants(2);
 
 figure('Name', 'Heliocentric trajectory', 'NumberTitle', 'on', 'Position', [0, 250, 600, 400], 'Color', [1 1 1]);
-plot3(Y_mercury(:,1)/n, Y_mercury(:,2)/n,  Y_mercury(:,3)/n, 'b-', 'LineWidth', 1);
+plot3(Y_mercury(:,1)/n, Y_mercury(:,2)/n, Y_mercury(:,3)/n, 'LineWidth', 1, 'Color', [0.6350 0.0780 0.1840]);
 hold on;
-plot3(Y_leg1(:,1)/n, Y_leg1(:,2)/n,  Y_leg1(:,3)/n, 'm-', 'LineWidth', 1);
-plot3(Y_earth(:,1)/n, Y_earth(:,2)/n,  Y_earth(:,3)/n, 'r-', 'LineWidth', 1);
-plot3(Y_leg2(:,1)/n, Y_leg2(:,2)/n,  Y_leg2(:,3)/n, 'g-', 'LineWidth', 1);
-plot3(Y_ast(:,1)/n, Y_ast(:,2)/n, Y_ast(:,3)/n, 'y-', 'LineWidth', 1);
+plot3(Y_leg1(:,1)/n, Y_leg1(:,2)/n, Y_leg1(:,3)/n,'LineWidth', 1, 'Color', [0.4940 0.1840 0.5560]); 
+plot3(Y_earth(:,1)/n, Y_earth(:,2)/n, Y_earth(:,3)/n,'LineWidth', 1, 'Color', [0 0.4470 0.7410]); 
+plot3(Y_leg2(:,1)/n, Y_leg2(:,2)/n, Y_leg2(:,3)/n, 'LineWidth', 1, 'Color', [0.4660 0.6740 0.1880]); 
+plot3(Y_ast(:,1)/n, Y_ast(:,2)/n, Y_ast(:,3)/n, 'LineWidth', 1, 'Color', [0.8500 0.3250 0.0980]); 
+
+Planet3d(10, [0, 0, 0]);                 % Sun
+Planet3d(2, (Y_mercury(end, 1:3) / n)*100);    % Mercury
+Planet3d(0, (Y_earth(end, 1:3) / n)*10);      % Earth
+
+
 xlabel('X [AU]');
 ylabel('Y [AU]');
 zlabel('Z [AU]');
@@ -395,9 +401,11 @@ y0p = [r0; vp];
 figure('Name', 'Fly-by trajectory (planetocentric)', 'NumberTitle', 'on', 'Position', [400, 250, 400, 400], 'Color', [1 1 1]);
 hold on;
 
-plot3(Y_fb_min(:, 1) / Re, Y_fb_min(:, 2) / Re, Y_fb_min(:, 3) / Re, 'm-', 'LineWidth', 1.5, 'DisplayName', 'Flyby hyperbola (infront)');
-plot3(Y_fb_plus(:, 1) / Re, Y_fb_plus(:, 2) / Re, Y_fb_plus(:, 3) / Re, 'g-', 'LineWidth', 1.5);
+plot3(Y_fb_min(:, 1) / Re, Y_fb_min(:, 2) / Re, Y_fb_min(:, 3) / Re, 'Color', [0.4940 0.1840 0.5560], 'LineWidth', 1.5, 'DisplayName', 'Flyby hyperbola (infront)');
+plot3(Y_fb_plus(:, 1) / Re, Y_fb_plus(:, 2) / Re, Y_fb_plus(:, 3) / Re, 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 1.5);
 plot3(0, 0, 0, 'yo', 'MarkerSize', 15, 'MarkerFaceColor', 'blue');
+%Planet3d(0, [0, 0, 0],0.5); 
+
 view(3);
 
 xlabel('x [Re]');
