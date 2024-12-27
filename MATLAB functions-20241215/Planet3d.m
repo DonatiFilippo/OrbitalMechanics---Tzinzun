@@ -1,4 +1,4 @@
-function Planet3d(plan, position,R1)
+function Planet3d(plan, position, unid, R1)
 
 % Planet3d.m - Planets texture loaded in a plot.
 %
@@ -28,40 +28,40 @@ function Planet3d(plan, position,R1)
 
 switch plan
     case 0 %Earth
-        R = 6371.01e-6;                                       % [km]
+        R = 6371.01;                                       % [km]
         image = 'https://www.h-schmidt.net/map/map.jpg';
     case 1 %Moon
-        R = 1737.4e-7;                                       % [km]
+        R = 1737.4;                                       % [km]
         %image = 'https://public-files.gumroad.com/j341xwrkvrduzmdlcsiymq8wz6ev';
         image = 'https://static.wikia.nocookie.net/planet-texture-maps/images/2/22/RS3_Moon.jpg/revision/latest?cb=20220815013406';
     case 2 %Mercury
-        R = 2439.7e-6;                                       % [km]
+        R = 2439.7;                                       % [km]
         image = 'https://static.wikia.nocookie.net/planet-texture-maps/images/7/78/Dh_mercury_texture.png/revision/latest?cb=20211010180321';
         %image = 'https://static.wikia.nocookie.net/planet-texture-maps/images/9/9d/Mercury_Texture_Map.png/revision/latest?cb=20240821203752';
     case 3 %Venus
-        R =  6051.8e-7;                                       % [km]
+        R =  6051.8;                                       % [km]
         image = 'https://static.wikia.nocookie.net/planet-texture-maps/images/f/fd/Dh_venus_surface_texture.png/revision/latest?cb=20211010212031';  
         % with clouds image = 'https://static.wikia.nocookie.net/planet-texture-maps/images/0/05/Dh_venus_cloud_texture.png/revision/latest?cb=20211010212201';
     case 4 %Mars
-        R = 3396.2e-7;                                       % [km]
+        R = 3396.2;                                       % [km]
         image = 'https://planet-texture-maps.fandom.com/wiki/Special:FilePath/Mars_Map.png';
     case 5 %Jupiter
-        R = 71492e-7;                                       % [km]
+        R = 71492;                                       % [km]
         image = 'https://www.solarsystemscope.com/textures/download/2k_jupiter.jpg';
     case 6 %Saturn
-        R = 60268e-7;                                       % [km]
+        R = 60268;                                       % [km]
         image = 'https://static.wikia.nocookie.net/planet-texture-maps/images/7/79/Saturn-0.png/revision/latest?cb=20161015093009';   
     case 7 %Uranus
-        R = 25559e-7;                                       % [km]
+        R = 25559;                                       % [km]
         image = 'https://static.wikia.nocookie.net/planet-texture-maps/images/c/c2/Dh_uranus_texture.png/revision/latest?cb=20211011001243';     
     case 8 %Neptune
-        R = 24764e-7;                                       % [km]
+        R = 24764;                                       % [km]
         image = 'https://www.solarsystemscope.com/textures/download/2k_neptune.jpg'; 
     case 9 %Pluto
-        R = 1188.3e-7;                                       % [km]
+        R = 1188.3;                                       % [km]
         image = 'https://static.wikia.nocookie.net/planet-texture-maps/images/6/64/Pluto_Made.png/revision/latest?cb=20190331055010';  
     case 10 %Sun
-        R = 696340e-7;                                       % [km]
+        R = 696340;                                       % [km]
         image = 'https://www.solarsystemscope.com/textures/download/2k_sun.jpg';  
 
 end     
@@ -71,6 +71,9 @@ if exist('R1', 'var') % Verifica si R1 existe como variable
     R = R1;
 end
 
+if unid == 'AU'
+    R = R/149597870.7;
+end
 
 
 %% Create Earth surface as a wireframe
