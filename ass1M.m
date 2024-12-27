@@ -140,7 +140,7 @@ upper_ga = [w_dep(end) w_fb(end) w_arr(end)];
 
 % Options for genetic
 options_ga = optimoptions('ga', 'PopulationSize', 300, ...
-    'FunctionTolerance', 0.001, 'Display', 'iter', 'MaxGenerations', 200);
+    'FunctionTolerance', 0.001, 'Display', 'off', 'MaxGenerations', 200);
  
 % Solver
 N         = ceil((mjd_arr-w_arr_max)/365.25);
@@ -422,15 +422,15 @@ zlim([-10, 10]);
 
 %% Porkchop patches
 % Windows for pork-chop to work
-step_pork = 27;
+step_plot = 27;
 
-w_dep_pork = w_dep(1) : step : w_dep(end);
-w_fb_pork = w_fb(1) : step : w_fb(end);
-w_arr_pork = w_arr(1) : step : w_arr(end);
+w_dep_plot = w_dep(1) : step_plot : w_dep(end);
+w_fb_plot = w_fb(1) : step_plot : w_fb(end);
+w_arr_plot = w_arr(1) : step_plot : w_arr(end);
 
-[delta_v1, delta_v2] = porkchop(w_dep_pork, w_fb_pork, w_fb_pork, w_arr_pork);
+[delta_v1, delta_v2] = porkchop(w_dep_plot, w_fb_plot, w_fb_plot, w_arr_plot);
 
-[w_dep_datenum, w_fb_datenum, w_arr_datenum, t_opt_datenum] = datedata(w_dep_pork, w_fb_pork, w_arr_pork, t_opt_sol);
+[w_dep_datenum, w_fb_datenum, w_arr_datenum, t_opt_datenum] = datedata(w_dep_plot, w_fb_plot, w_arr_plot, t_opt_sol);
 
 figure('Name', 'Pork chop plot contour from Mercury to Earth', 'NumberTitle', 'on', 'Position', [800, 0, 400, 350], 'Color', [1 1 1])
 hold on
