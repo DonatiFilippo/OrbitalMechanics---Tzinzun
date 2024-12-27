@@ -71,8 +71,17 @@ if exist('R1', 'var') % Verifica si R1 existe como variable
     R = R1;
 end
 
-if unid == 'AU'
-    R = R/149597870.7;
+switch unid
+    case "KM"
+        R = R;
+    case "AU"
+        R = R / 149597870.7;
+    case "RE"
+        R = R / 6371;
+    case "M"
+        R = R / 1000;
+    otherwise
+        error("Unid not defined, must be capital letters.");
 end
 
 
