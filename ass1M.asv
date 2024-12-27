@@ -102,7 +102,7 @@ fprintf(fileID,'\n\n');
 fclose(fileID);
 
 step = 1; % Step size of days for iterating through time windows
-SM   = 0.4; % Safety margin for time of flight, 50% adjustment based on bibliography
+SM   = 0.4; % Safety margin for time of flight, 40% adjustment based on bibliography
 
 % Calculate the synodic period with the most relevance
 SP = max([T_syn_dep2fb, T_syn_fb2arr, T_syn_dep2arr]) / 86400; % Synodic period in days
@@ -421,16 +421,16 @@ ylim([-10, 10]);
 zlim([-10, 10]);
 
 %% Porkchop patches
-% Windows for pork-chop to work (it doesnt work yet)
-step_pork = 27;
+% Windows for pork-chop to work
+step_plot = 27;
 
-w_dep_pork = w_dep(1) : step_pork : w_dep(end);
-w_fb_pork = w_fb(1) : step_pork : w_fb(end);
-w_arr_pork = w_arr(1) : step_ : w_arr(end);
+w_dep_plot = w_dep(1) : step_plot : w_dep(end);
+w_fb_plot = w_fb(1) : step_plot : w_fb(end);
+w_arr_plot = w_arr(1) : step_plot : w_arr(end);
 
-[delta_v1, delta_v2] = porkchop(w_dep_pork, w_fb_pork, w_fb_pork, w_arr_pork);
+[delta_v1, delta_v2] = porkchop(w_dep_plot, w_fb_plot, w_fb_plot, w_arr_plot);
 
-[w_dep_datenum, w_fb_datenum, w_arr_datenum, t_opt_datenum] = datedata(w_dep_pork, w_fb_pork, w_arr_pork, t_opt_sol);
+[w_dep_datenum, w_fb_datenum, w_arr_datenum, t_opt_datenum] = datedata(w_dep_plot, w_fb_plot, w_arr_plot, t_opt_sol);
 
 figure('Name', 'Pork chop plot contour from Mercury to Earth', 'NumberTitle', 'on', 'Position', [800, 0, 400, 350], 'Color', [1 1 1])
 hold on

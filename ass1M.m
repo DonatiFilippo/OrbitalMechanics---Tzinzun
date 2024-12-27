@@ -102,7 +102,7 @@ fprintf(fileID,'\n\n');
 fclose(fileID);
 
 step = 1; % Step size of days for iterating through time windows
-SM   = 0.4; % Safety margin for time of flight, 50% adjustment based on bibliography
+SM   = 0.4; % Safety margin for time of flight, 40% adjustment based on bibliography
 
 % Calculate the synodic period with the most relevance
 SP = max([T_syn_dep2fb, T_syn_fb2arr, T_syn_dep2arr]) / 86400; % Synodic period in days
@@ -205,7 +205,7 @@ date_arr_grad = mjd20002date(t_refined_grad(3));
 
 %% Refinamiento Simulated Annealing
 
-options_sa = optimoptions('simulannealbnd', 'MaxIterations', 1500, 'Display', 'off', 'PlotFcns', []);
+options_sa = optimoptions('simulannealbnd', 'MaxIterations', 2000, 'Display', 'off', 'PlotFcns', []);
 
 [t_refined_sa, dv_min_sa] = simulannealbnd(@(t) interplanetary(t(1), t(2), t(3)), t_opt_ga, lower_ga, upper_ga, options_sa);
 
@@ -276,8 +276,6 @@ date_arr_sol = mjd20002date(t_opt_sol(3));
 [dv_opt, dv_dep, dv_arr, r1, v1i, r2, v2f, r3, v3f, v1t, v2t, v2t_1, v3t, vinfmin_vec, vinfplus_vec, ~] = interplanetary(t_opt_sol(1), t_opt_sol(2), t_opt_sol(3));
 [vinfm, vinfp, delta, rp, am, ap, em, ep, vpm, vpp, deltam, deltap, dv_fb_tot, dv_fb_pow]               = flyby_powered(vinfmin_vec, vinfplus_vec, muE);
 
-disp(dv_opt);
-     
 v1_t = v1t';        
 v2_t = v2t_1';  
 
