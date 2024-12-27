@@ -48,6 +48,7 @@ fileID = fopen(filename,'a+');
 fprintf(fileID,'Mercury to Asteroid no.30 w flyby on Earth\n');
 fprintf(fileID,'Mission Window : [%d %d %d %d %d %d] - [%d %d %d %d %d %d]\n',Departure_date,Arrival_date);
 fclose(fileID);
+
 %% PHYSICAL PARAMETERS
    Departure_planet = 1;  % Mercury as the departure planet 
        Flyby_planet = 3;  % Earth as the flyby planet
@@ -100,8 +101,7 @@ fprintf(fileID,'Total time of flight from Mercury to the asteroid : %f years \n'
 fprintf(fileID,'\n\n');
 fclose(fileID);
 
-% Step size of says for iterating through time windows
-step = 23;
+step = 1; % Step size of days for iterating through time windows
 SM   = 0.4; % Safety margin for time of flight, 40% adjustment based on bibliography
 
 % Calculate the synodic period with the most relevance
@@ -139,11 +139,12 @@ lower_ga = [w_dep(1) w_fb(1) w_arr(1)];
 upper_ga = [w_dep(end) w_fb(end) w_arr(end)];
 
 % Options for genetic
-options_ga = optimoptions('ga', 'PopulationSize', 500, 'FunctionTolerance', 1e-4, 'Display', 'off', 'MaxGenerations', 300);
+options_ga = optimoptions('ga', 'PopulationSize', 300, ...
+    'FunctionTolerance', 0.001, 'Display', 'off', 'MaxGenerations', 200);
  
 % Solver
-N         = 1;
-N_ga      = 15;        % Number of genetic algorithm iteration to have better results
+N         = ceil((mjd_arr-w_arr_max)/365.25);
+N_ga      = 3;        % Number of genetic algorithm iteration to have better results
 dv_min_ga = 50;        % Arbitrary chosen value of total cost
 t_opt_ga  = [0, 0, 0]; % Storage value for the chosen windows
 
@@ -179,7 +180,7 @@ date_arr_ga = mjd20002date(t_opt_ga(3));
 
 %% Refinement with FMINCON
 % fmincon Configuration sqp selection options
-options_fmincon = optimoptions('fmincon','Display', 'off', 'Algorithm', 'sqp','StepTolerance', 1e-8, 'OptimalityTolerance', 1e-8);
+options_fmincon = optimoptions('fmincon','Display', 'off', 'Algorithm', 'sqp','StepTolerance', 1e-10, 'OptimalityTolerance', 1e-8);
 
 % Fmincon solver
 fprintf('Refining Solution with FMINCON...\n');
@@ -204,12 +205,12 @@ date_arr_grad = mjd20002date(t_refined_grad(3));
 
 %% Refinamiento Simulated Annealing
 
-options_sa = optimoptions('simulannealbnd', 'MaxIterations', 3000,'Display', 'off', 'PlotFcns', []);
+options_sa = optimoptions('simulannealbnd', 'MaxIterations', 2000, 'Display', 'off', 'PlotFcns', []);
 
 [t_refined_sa, dv_min_sa] = simulannealbnd(@(t) interplanetary(t(1), t(2), t(3)), t_opt_ga, lower_ga, upper_ga, options_sa);
 
 date_dep_sa = mjd20002date(t_refined_sa(1));
-date_fb_sa  = mjd20002date(t_refined_sa(2));
+date_fb_sa = mjd20002date(t_refined_sa(2));
 date_arr_sa = mjd20002date(t_refined_sa(3));
 
 %% Algorithm comparison
@@ -272,9 +273,9 @@ date_arr_sol = mjd20002date(t_opt_sol(3));
 
 %% PLOT RESULTS
 %% Results 
-[dv_opt, dv_dep, dv_arr, r1, v1i, r2, v2f, r3, v3f, v1t, v2t, v2t_1, v3t, vinfmin_vec, vinfplus_vec, ~] = interplanetary(t_refined_grad(1), t_refined_grad(2), t_refined_grad(3));
+[dv_opt, dv_dep, dv_arr, r1, v1i, r2, v2f, r3, v3f, v1t, v2t, v2t_1, v3t, vinfmin_vec, vinfplus_vec, ~] = interplanetary(t_opt_sol(1), t_opt_sol(2), t_opt_sol(3));
 [vinfm, vinfp, delta, rp, am, ap, em, ep, vpm, vpp, deltam, deltap, dv_fb_tot, dv_fb_pow]               = flyby_powered(vinfmin_vec, vinfplus_vec, muE);
-     
+
 v1_t = v1t';        
 v2_t = v2t_1';  
 
@@ -341,10 +342,9 @@ plot3(Y_earth(:,1)/n, Y_earth(:,2)/n, Y_earth(:,3)/n,'LineWidth', 1, 'Color', [0
 plot3(Y_leg2(:,1)/n, Y_leg2(:,2)/n, Y_leg2(:,3)/n, 'LineWidth', 1, 'Color', [0.4660 0.6740 0.1880]); 
 plot3(Y_ast(:,1)/n, Y_ast(:,2)/n, Y_ast(:,3)/n, 'LineWidth', 1, 'Color', [0.8500 0.3250 0.0980]); 
 
-Planet3d(10, [0, 0, 0]);                 % Sun
-Planet3d(2, (Y_mercury(end, 1:3) / n)*100);    % Mercury
-Planet3d(0, (Y_earth(end, 1:3) / n)*10);      % Earth
-
+%Planet3d(10, [0, 0, 0]);                        % Sun
+%Planet3d(2, (Y_mercury(end, 1:3) / n)*100);     % Mercury
+%Planet3d(0, (Y_earth(end, 1:3) / n)*10);        % Earth
 
 xlabel('X [AU]');
 ylabel('Y [AU]');
@@ -359,7 +359,6 @@ hold off;
 %% Fly-by trajectory (planetocentric)
 % Results
 CA = rp - Re; % Altitude of closest approach
-
 
 fileID = fopen(filename,'a+');
 fprintf(fileID,'The altitude of the closest approach is : %f km \n\n', CA);
@@ -420,10 +419,16 @@ ylim([-10, 10]);
 zlim([-10, 10]);
 
 %% Porkchop patches
+% Windows for pork-chop to work
+step_plot = 27;
 
-[delta_v1, delta_v2] = porkchop(w_dep, w_fb, w_fb, w_arr);
+w_dep_plot = w_dep(1) : step_plot : w_dep(end);
+w_fb_plot = w_fb(1) : step_plot : w_fb(end);
+w_arr_plot = w_arr(1) : step_plot : w_arr(end);
 
-[w_dep_datenum, w_fb_datenum, w_arr_datenum, t_opt_datenum] = datedata(w_dep, w_fb, w_arr, t_opt_sol);
+[delta_v1, delta_v2] = porkchop(w_dep_plot, w_fb_plot, w_fb_plot, w_arr_plot);
+
+[w_dep_datenum, w_fb_datenum, w_arr_datenum, t_opt_datenum] = datedata(w_dep_plot, w_fb_plot, w_arr_plot, t_opt_sol);
 
 figure('Name', 'Pork chop plot contour from Mercury to Earth', 'NumberTitle', 'on', 'Position', [800, 0, 400, 350], 'Color', [1 1 1])
 hold on
