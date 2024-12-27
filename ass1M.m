@@ -422,6 +422,9 @@ zlim([-10, 10]);
 % Windows for pork-chop to work
 step_plot = 27;
 
+lower_ga 
+            upper_ga
+
 w_dep_plot = w_dep(1) : step_plot : w_dep(end);
 w_fb_plot = w_fb(1) : step_plot : w_fb(end);
 w_arr_plot = w_arr(1) : step_plot : w_arr(end);
