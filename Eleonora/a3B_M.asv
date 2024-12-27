@@ -7,9 +7,9 @@ function a = a3B_M(t, r, mu_M, date)
 %   a = a3B_M(t, r, mu_M, date)
 %
 % DESCRIPTION:
-%   It gives the perturbing acceleration due to gravitational influence of
-%   the Moon on a at a given epoch in Geocentric Equatorial Reference Frame.
-%   This frame {x,y,z} is characterised by:
+%   It gives the perturbing acceleration of the Moon at a given epoch in
+%   Geocentric Equatorial Reference Frame (IAU-76/FK5 J2000, mean equator,
+%   mean equinox frame) This frame {x,y,z} is characterised by:
 %       x-axis: on the equatorial plane, along the direction of the gamma
 %           point
 %       z-axis: direction of the north pole
