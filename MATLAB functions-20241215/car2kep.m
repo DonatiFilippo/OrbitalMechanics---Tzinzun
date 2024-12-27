@@ -1,24 +1,40 @@
 function [a, e, i, Omega, omega, nu] = car2kep(varargin)
-    % CAR2KEP - Convierte vectores de estado cartesianos a elementos keplerianos.
-    %
-    % Inputs:
-    %   a       [1]   Semi-major axis                      [km]
-    %   e       [1]   Eccentricity                         [-]
-    %   i       [1]   Inclination                          [deg]
-    %   Omega   [1]   Right ascension of the ascending node [deg]
-    %   omega   [1]   Argument of perigee                  [deg]
-    %   nu       [1]   True anomaly                         [deg]
-    %   mu      [1]   Gravitational parameter of the primary body [km^3/s^2]
-    % Input can be a vector
-    %
-    % OUTPUT:
-    %   r       [3x1]   Position vector in Cartesian coordinates [km]
-    %   v       [3x1]   Velocity vector in Cartesian coordinates [km/s]
-    %
-    %
-    % Author
-    %  Maria Paulina Pantoja Gavidia
-    % -------------------------------------------------------------------------
+%% FUNCTION DESCRIPTION
+%
+%--------------------------------------------------------------------------
+% DESCRIPTION:
+% This function converts a state vector (position and velocity in Cartesian 
+% coordinates) into Keplerian orbital elements. It is applicable for any orbit 
+% around a central body, assuming a Newtonian two-body problem.
+%
+%--------------------------------------------------------------------------
+% INPUTS:
+%   varargin    [1x6] or [1x2]
+%       - A single input vector containing position and velocity components:
+%         [r_x, r_y, r_z, v_x, v_y, v_z] [km, km/s].
+%       - Alternatively, the position and velocity vectors can be provided 
+%         separately as [r] and [v] ([km] and [km/s]).
+%
+%--------------------------------------------------------------------------
+% OUTPUTS:
+%   a       [1x1]   Semi-major axis                                [km]
+%   e       [1x1]   Eccentricity                                   [-]
+%   i       [1x1]   Inclination                                    [deg]
+%   Omega   [1x1]   Right ascension of the ascending node (RAAN)   [deg]
+%   omega   [1x1]   Argument of periapsis                          [deg]
+%   nu      [1x1]   True anomaly                                   [deg]
+%
+%--------------------------------------------------------------------------
+% Group number : 27
+%
+% Created and maintained by : 
+%   Azevedo Da Silva Esteban
+%   Gavidia Pantoja Maria Paulina
+%   Donati Filippo 
+%   Domenichelli Eleonora
+%
+%--------------------------------------------------------------------------
+
     if nargin == 1 && isvector(varargin{1})
         State = varargin{1};
         r = State(1:3);
