@@ -3,32 +3,44 @@ function [vinfm, vinfp, delta, rp, am, ap, em, ep, vpm, vpp, deltam, deltap, dv,
 %
 %--------------------------------------------------------------------------
 % DESCRIPTION:
-% This code provides all data correlated to a powered gravity-assist 
-% manoeuvre
+% This function computes the parameters and velocity changes associated with 
+% a powered gravity-assist maneuver (flyby). It calculates the trajectory 
+% characteristics and required delta-v for modifying the spacecraft's trajectory 
+% during the flyby of a celestial body.
 %
 %--------------------------------------------------------------------------
 % INPUTS:
-%
-% vinfmin_vec     [1x3]    Velocity at infinite before fb    [km/s]
-% vinfplus_vec    [1x3]    Velocity at infinite after fb     [km/s]
+%   vinfmin_vec  [1x3]   Incoming hyperbolic excess velocity vector before flyby [km/s]
+%   vinfplus_vec [1x3]   Outgoing hyperbolic excess velocity vector after flyby  [km/s]
+%   mu           [1x1]   Gravitational parameter of the flyby planet             [km^3/s^2]
 %
 %--------------------------------------------------------------------------
-% OUTPUT:
-%
-%   TO DO ...
+% OUTPUTS:
+%   vinfm        [1x1]   Magnitude of incoming velocity at infinity              [km/s]
+%   vinfp        [1x1]   Magnitude of outgoing velocity at infinity              [km/s]
+%   delta        [1x1]   Turning angle during the flyby                          [rad]
+%   rp           [1x1]   Pericenter radius (closest approach to the planet)      [km]
+%   am           [1x1]   Semi-major axis of the incoming hyperbolic trajectory   [km]
+%   ap           [1x1]   Semi-major axis of the outgoing hyperbolic trajectory   [km]
+%   em           [1x1]   Eccentricity of the incoming hyperbolic trajectory      [-]
+%   ep           [1x1]   Eccentricity of the outgoing hyperbolic trajectory      [-]
+%   vpm          [1x1]   Pericenter velocity for the incoming trajectory         [km/s]
+%   vpp          [1x1]   Pericenter velocity for the outgoing trajectory         [km/s]
+%   deltam       [1x1]   Incoming hyperbolic trajectory deflection angle         [rad]
+%   deltap       [1x1]   Outgoing hyperbolic trajectory deflection angle         [rad]
+%   dv           [1x1]   Total delta-v required for the maneuver                 [km/s]
+%   dvp          [1x1]   Delta-v applied at the pericenter                       [km/s]
 %
 %--------------------------------------------------------------------------
 % Group number : 27
 %
 % Created and maintained by : 
+%   Azevedo Da Silva Esteban
+%   Gavidia Pantoja Maria Paulina
+%   Donati Filippo 
+%   Domenichelli Eleonora
 %
-% Azevedo Da Silva Esteban
-% Gavidia Pantoja Maria Paulina
-% Donati Filippo 
-% Domenichelli Eleonora
-% 
 %--------------------------------------------------------------------------
-% LAST UPDATE: 21-12-2024
 %
 
 vinfm = norm(vinfmin_vec);
