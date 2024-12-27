@@ -58,11 +58,18 @@ T_syn_dep2fb = T_dep * T_fb/abs(T_dep - T_fb); % Mercury's synodic orbital perio
 T_syn_fb2arr = T_fb * T_arr/abs(T_fb - T_arr); % Earth's synodic orbital period with respect to the asteroid [s]
 T_syn_dep2arr = T_dep * T_arr/abs(T_dep - T_arr); % Mercury's synodic orbital period with respect to the asteroid [s]
 
+T1 = floor(T_syn_dep2fb/86400);
+T2 = floor(T_syn_fb2arr/86400);
+T3 = floor(T_syn_dep2arr/86400);
+
 fprintf('Displaying synodics period in years :\n\n');
 fprintf('Mercury''s synodic orbital period with respect to Earth : %f years \n', T_syn_dep2fb/(86400*365.25));
 fprintf('Earth''s synodic orbital period with respect to the asteroid : %f years \n', T_syn_fb2arr/(86400*365.25));
 fprintf('Mercury''s synodic orbital period with respect to the asteroid : %f years \n', T_syn_dep2arr/(86400*365.25));
 fprintf('\n\n');
+
+PPCM = lcm(lcm(T1, T2), T3);
+disp(lcm(T1, T2));
 
 % The greatest synodic period is the one of Earth with respect to the asteroid
 % To find the best window we have to search with respect to this period
@@ -111,7 +118,6 @@ tof_t2_max = (1 + SM) * tof_t2; % Maximum time of flight Earth -> Asteroid
 
 % Calculate the last possible departure time from Mercury
 t_ldM = SP - tof_t1_min; % Last departure from Mercury to arrive within the synodic period
-
 
 % Define the departure window from Mercury
 w_dep = mjd_dep : step : mjd_dep + t_ldM; % First departure window from Mercury
