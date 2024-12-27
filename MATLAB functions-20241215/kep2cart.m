@@ -20,7 +20,17 @@ function [r_vect,v_vect] = kep2cart(varargin)
 %   r_vect     [3x1]       Position Vector           [km]
 %   v_vect     [3x1]       Velocity Vector           [km/s]
 %--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+% Group number : 27
 %
+% Created and maintained by : 
+%
+% Azevedo Da Silva Esteban
+% Gavidia Pantoja Maria Paulina
+% Donati Filippo 
+% Domenichelli Eleonora
+% 
+%--------------------------------------------------------------------------
 if nargin == 1
     % Formato: kep2cart(kep)
     if isvector(varargin{1})
