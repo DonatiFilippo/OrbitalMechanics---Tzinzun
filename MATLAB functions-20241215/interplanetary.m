@@ -16,6 +16,21 @@ function [dv, dv_dep, dv_arr, r1, v1i, r2, v2f, r3, v3f, v1t, v2t, v2t_1, v3t, v
 %--------------------------------------------------------------------------
 % OUTPUT:
 %   dv          [1x1]       Total cost                  [km/s]
+%   dv_dep      [1x1]       Delta-v for departure arc   [km/s]
+%   dv_arr      [1x1]       Delta-v for arrival arc     [km/s]
+%   r1          [3x1]       Initial position vector     [km]
+%   v1i         [3x1]       Initial velocity vector     [km/s]
+%   r2          [3x1]       Fly-by position vector      [km]
+%   v2f         [3x1]       Fly-by velocity vector      [km/s]
+%   r3          [3x1]       Arrival position vector     [km]
+%   v3f         [3x1]       Arrival velocity vector     [km/s]
+%   v1t         [3x1]       Transfer velocity vector at departure [km/s]
+%   v2t         [3x1]       Transfer velocity vector at fly-by (arrival) [km/s]
+%   v2t_1       [3x1]       Transfer velocity vector at fly-by (departure) [km/s]
+%   v3t         [3x1]       Transfer velocity vector at arrival [km/s]
+%   vinfmin_vec [3x1]       Velocity difference at infinity (approaching fly-by planet) [km/s]
+%   vinfplus_vec[3x1]       Velocity difference at infinity (leaving fly-by planet) [km/s]
+%   cost        [1x1]       Penalty cost for infeasible solutions (large value or NaN)
 %
 %--------------------------------------------------------------------------
 % Group number : 27
