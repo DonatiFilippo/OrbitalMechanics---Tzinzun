@@ -1,4 +1,39 @@
 function dvtot = Lambert (t1, t2, planet1, planet2)
+%% FUNCTION DESCRIPTION
+%
+%--------------------------------------------------------------------------
+% DESCRIPTION:
+% This function provides a fast and optimized implementation of the Lambert problem
+% solver for interplanetary missions. It calculates the total delta-v required for 
+% a transfer between two celestial bodies given their departure and arrival dates.
+% The function utilizes the `LambertMR` solver, simplifying its application by 
+% automatically retrieving planetary or asteroid ephemerides for the given dates.
+%
+%--------------------------------------------------------------------------
+% INPUTS:
+%   t1          [1x1]   Departure time (MJD2000)                      [mjd2000]
+%   t2          [1x1]   Arrival time (MJD2000)                        [mjd2000]
+%   planet1     [1x1]   ID of the departure celestial body            [-]
+%                       (1 = Mercury, ..., 9 = Pluto, >10 = Asteroid ID)
+%   planet2     [1x1]   ID of the arrival celestial body              [-]
+%                       (1 = Mercury, ..., 9 = Pluto, >10 = Asteroid ID)
+%
+%--------------------------------------------------------------------------
+% OUTPUT:
+%   dvtot       [1x1]   Total delta-v required for the transfer [km/s]
+%
+%--------------------------------------------------------------------------
+% Group number : 27
+%
+% Created and maintained by : 
+%   Azevedo Da Silva Esteban
+%   Gavidia Pantoja Maria Paulina
+%   Donati Filippo 
+%   Domenichelli Eleonora
+% 
+%--------------------------------------------------------------------------
+%
+
  muS = astroConstants(4);
 
 % Initial condition
