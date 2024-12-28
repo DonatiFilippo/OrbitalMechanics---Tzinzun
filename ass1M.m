@@ -481,7 +481,7 @@ ylabel('Time of departure [MJD2000]')
 zlabel('Delta V [km/s]')
 [X, Y] = meshgrid(linspace(min(w_arr_datenum), max(w_arr_datenum), 50), ...
                   linspace(min(w_fb_datenum), max(w_fb_datenum), 50));
-delta_v_interp = interp2(w_arr_datenum, w_fb_datenum, delta_v2, X, Y, 'spline');
+delta_v_interp = interp2(w_arr_datenum, w_fb_datenum, delta_v1, X, Y, 'spline');
 surf(X, Y, delta_v_interp, 'EdgeColor', 'k', 'FaceAlpha', 0.5);
 colormap parula
 colorbar
