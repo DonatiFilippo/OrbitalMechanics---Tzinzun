@@ -12,7 +12,7 @@ theta = kep(6);
 % Evaluate perturbing acceleration
 [rp, vp] =  parorb2rv (kep(1), kep(2), kep(3), kep(4), kep(5), kep(6), mu);
 ap_ECI = aJ2(rp, mu, R, J2) + a3B_M(t, rp, muM, date);
-ap_TNH = car2TNH(rp, vp) * ap_ECI;
+ap_TNH = GE2TNH(rp, vp) * ap_ECI;
 ap = TNH2RSW(kep, mu) * ap_TNH;
 
 % Evaluate equations of motion (Keplerian parameters evolution)
