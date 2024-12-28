@@ -222,7 +222,7 @@ fprintf(fileID,'Departure: %02d/%02d/%04d\n', date_dep_ga(3), date_dep_ga(2), da
 fprintf(fileID,'Flyby: %02d/%02d/%04d\n', date_fb_ga(3), date_fb_ga(2), date_fb_ga(1));
 fprintf(fileID,'Arrival: %02d/%02d/%04d\n', date_arr_ga(3), date_arr_ga(2), date_arr_ga(1));
 fprintf(fileID,'Delta-v: %.2f km/s\n', dv_min_ga);
-fprintf(fileID,'\n\n')
+fprintf(fileID,'\n\n');
 fclose(fileID);
 
 % FMINCON Refinement
@@ -232,7 +232,7 @@ fprintf(fileID,'Departure: %02d/%02d/%04d\n', date_dep_ref(3), date_dep_ref(2), 
 fprintf(fileID,'Flyby: %02d/%02d/%04d\n', date_fb_ref(3), date_fb_ref(2), date_fb_ref(1));
 fprintf(fileID,'Arrival: %02d/%02d/%04d\n', date_arr_ref(3), date_arr_ref(2), date_arr_ref(1));
 fprintf(fileID,'Delta-v: %.2f km/s\n', dv_min_fmin);
-fprintf(fileID,'\n\n')
+fprintf(fileID,'\n\n');
 fclose(fileID);
 
 % Refined solution with gradient
@@ -242,7 +242,7 @@ fprintf(fileID,'Departure date : %02d/%02d/%04d\n', date_dep_grad(3), date_dep_g
 fprintf(fileID,'Fly-by date: %02d/%02d/%04d\n', date_fb_grad(3), date_fb_grad(2), date_fb_grad(1));
 fprintf(fileID,'Arrival date : %02d/%02d/%04d\n', date_arr_grad(3), date_arr_grad(2), date_arr_grad(1));
 fprintf(fileID,'Minimised cost with gradient : %f km/s \n', dv_min_grad);
-fprintf(fileID,'\n\n')
+fprintf(fileID,'\n\n');
 fclose(fileID);
 
 % Simulated Annealing
@@ -252,7 +252,7 @@ fprintf(fileID,'Departure: %02d/%02d/%04d \n', date_dep_sa(3), date_dep_sa(2), d
 fprintf(fileID,'Flyby: %02d/%02d/%04d \n', date_fb_sa(3), date_fb_sa(2), date_fb_sa(1));
 fprintf(fileID,'Arrival: %02d/%02d/%04d \n', date_arr_sa(3), date_arr_sa(2), date_arr_sa(1));
 fprintf(fileID,'Delta-v: %.2f km/s\n', dv_min_sa);
-fprintf(fileID,'\n\n')
+fprintf(fileID,'\n\n');
 fclose(fileID);
 
 %% Choice of the best solution
@@ -343,10 +343,10 @@ plot3(Y_leg2(:,1)/n, Y_leg2(:,2)/n, Y_leg2(:,3)/n, 'LineWidth', 1, 'Color', [0.4
 plot3(Y_ast(:,1)/n, Y_ast(:,2)/n, Y_ast(:,3)/n, 'LineWidth', 1, 'Color', [0.8500 0.3250 0.0980]); 
 
 
-Planet3d(10, [0, 0, 0], '~', 0.0931);     % Sun scaled to 20 times its size in AU for visualization purposes only.
-Planet3d(2, [Y_mercury(end,1)/n, Y_mercury(end,2)/n, Y_mercury(24833,3)/n], '~', 0.0489);     % Mercury scaled to 3000 times its size in AU for visualization purposes only.
-Planet3d(0, [Y_earth(500,1)/n, Y_earth(500,2)/n, Y_earth(1,3)/n], '~', 0.0426);        % Eart scaled to 1000 times its size in AU for visualization purposes only.
-Planet3d(11, [Y_ast(end,1)/n, Y_ast(end,2)/n, Y_ast(1,3)/n], '~', 0.0200);        % Asteroid just for visualization purposes only.
+Planet3d(10, [0, 0, 0], '~', 0.0931);                                                       % Sun scaled to 20 times its size in AU for visualization purposes only.
+Planet3d(2, [Y_mercury(end,1)/n, Y_mercury(end,2)/n, Y_mercury(24833,3)/n], '~', 0.0489);   % Mercury scaled to 3000 times its size in AU for visualization purposes only.
+Planet3d(0, [Y_earth(500,1)/n, Y_earth(500,2)/n, Y_earth(1,3)/n], '~', 0.0426);             % Eart scaled to 1000 times its size in AU for visualization purposes only.
+Planet3d(11, [Y_ast(end,1)/n, Y_ast(end,2)/n, Y_ast(1,3)/n], '~', 0.0200);                  % Asteroid just for visualization purposes only.
 
 
 xlabel('X [AU]');
@@ -399,15 +399,6 @@ y0p = [r0; vp];
 [t_fb_min, Y_fb_min  ] = ode113(@(t, y) ode_2bp(t, y, muE), tspan_m, y0m, options_fb);
 [t_fb_plus, Y_fb_plus] = ode113(@(t, y) ode_2bp(t, y, muE), tspan_p, y0p, options_fb);
 
-% Generar puntos para las asíntotas
-scale_asymptote = 500 ; % Escala para extender las asíntotas (en km)
-r_asymptote_m_start = r0/Re+r0/Re; % Inicio de la asíntota en el periapsis
-r_asymptote_m_end = r0/Re + scale_asymptote * a_hyp/b_hyp; % Extremo de la asíntota
-r_asymptote_p_start = r0/Re + r0/Re; % Inicio de la asíntota en el periapsis
-r_asymptote_p_end = r0/Re + scale_asymptote * dir_asymptote_p; % Extremo de la asíntota
-
-
-
 % Plot
 figure('Name', 'Fly-by trajectory (planetocentric)', 'NumberTitle', 'on', 'Position', [500, 250, 400, 400], 'Color', [1 1 1]);
 hold on;
@@ -435,7 +426,7 @@ zlim([-10, 10]);
 step_plot = 25;
 
 w_dep_plot = lower_ga(1) : step_plot : upper_ga(1);
-w_fb_plot = lower_ga(2) : step_plot : upper_ga(2);
+ w_fb_plot = lower_ga(2) : step_plot : upper_ga(2);
 w_arr_plot = lower_ga(3) : step_plot : upper_ga(3);
 
 [delta_v1, delta_v2] = porkchop(w_dep_plot, w_fb_plot, w_fb_plot, w_arr_plot);
