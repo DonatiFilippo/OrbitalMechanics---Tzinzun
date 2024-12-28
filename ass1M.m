@@ -335,12 +335,12 @@ y_ast     = [ r3; v3f ];
 n = astroConstants(2);
 
 figure('Name', 'Heliocentric trajectory', 'NumberTitle', 'on', 'Position', [0, 250, 500, 500], 'Color', [1 1 1]);
-plot3(Y_mercury(:,1)/n, Y_mercury(:,2)/n, Y_mercury(:,3)/n, 'LineWidth', 1, 'Color', [0.6350 0.0780 0.1840]);
+plot3(Y_mercury(:,1)/n, Y_mercury(:,2)/n, Y_mercury(:,3)/n, 'LineWidth', 1, 'Color', [0.4039 0.5333 0.6353]);
 hold on;
-plot3(Y_leg1(:,1)/n, Y_leg1(:,2)/n, Y_leg1(:,3)/n,'LineWidth', 1, 'Color', [0.4940 0.1840 0.5560]); 
-plot3(Y_earth(:,1)/n, Y_earth(:,2)/n, Y_earth(:,3)/n,'LineWidth', 1, 'Color', [0 0.4470 0.7410]); 
-plot3(Y_leg2(:,1)/n, Y_leg2(:,2)/n, Y_leg2(:,3)/n, 'LineWidth', 1, 'Color', [0.4660 0.6740 0.1880]); 
-plot3(Y_ast(:,1)/n, Y_ast(:,2)/n, Y_ast(:,3)/n, 'LineWidth', 1, 'Color', [0.8500 0.3250 0.0980]); 
+plot3(Y_leg1(:,1)/n, Y_leg1(:,2)/n, Y_leg1(:,3)/n,'LineWidth', 1, 'Color', [0.9290 0.6940 0.1250]); 
+plot3(Y_earth(:,1)/n, Y_earth(:,2)/n, Y_earth(:,3)/n,'LineWidth', 1, 'Color', [0.4980 0.6706 0.5255]); 
+plot3(Y_leg2(:,1)/n, Y_leg2(:,2)/n, Y_leg2(:,3)/n, 'LineWidth', 1, 'Color', [0.4940 0.1840 0.5560]); 
+plot3(Y_ast(:,1)/n, Y_ast(:,2)/n, Y_ast(:,3)/n, 'LineWidth', 1, 'Color', [0.8667 0.5608 0.4314]); 
 
 
 Planet3d(10, [0, 0, 0], '~', 0.0931);                                                       % Sun scaled to 20 times its size in AU for visualization purposes only.
