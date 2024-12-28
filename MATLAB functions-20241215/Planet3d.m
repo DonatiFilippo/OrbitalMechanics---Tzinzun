@@ -1,30 +1,46 @@
 function Planet3d(plan, position, unid, R1)
 
-% Planet3d.m - Planets texture loaded in a plot.
+%% FUNCTION DESCRIPTION
 %
-%   List of identifiers:
+%--------------------------------------------------------------------------
+% DESCRIPTION:
+% This function visualizes a selected planet or celestial body in 3D, 
+% using texture mapping to represent its appearance accurately. It plots 
+% the selected body at the specified position, scale, and orientation.
 %
-%   0   Earth
-%   1   Moon
-%   2   Mercury
-%   3   Venus
-%   4   Mars
-%   5   Jupiter
-%   6   Saturno
-%   7   Uranus
-%   8   Neputne
-%   9   Pluto
-%   10  Sun
+%--------------------------------------------------------------------------
+% INPUTS:
+%   plan      [1x1]  Identifier of the planet or celestial body (integer):
+%                    0:  Earth
+%                    1:  Moon
+%                    2:  Mercury
+%                    3:  Venus
+%                    4:  Mars
+%                    5:  Jupiter
+%                    6:  Saturn
+%                    7:  Uranus
+%                    8:  Neptune
+%                    9:  Pluto
+%                    10: Sun
+%                    11: Generic algorithm (used for custom textures)
+%   position  [1x3]  Position of the planet in Cartesian coordinates [km].
+%   unid      [1x1]  Unit scaling factor (e.g., 1 for km, 1000 for m, etc.).
+%   R1        [1x1]  Radius of the planet or celestial body [km].
 %
-% Inputs:
-%   plan      Vector of identifiers of planet's selection.       
+%--------------------------------------------------------------------------
+% OUTPUTS:
+%   []       [figure]   Opens a figure displaying the selected planet with
+%                       the applied texture.
 %
-% Outputs:
-%   []          [figure]    Figure open with the Planet's selected picture loaded
+%--------------------------------------------------------------------------
+% Group number : 27
 %
-% Author
-%  Maria Paulina Pantoja Gavidia
-% ------------------------------------------------------------------------
+% Created and maintained by : 
+%   Azevedo Da Silva Esteban
+%   Gavidia Pantoja Maria Paulina
+%   Donati Filippo
+%   Domenichelli Eleonora
+%--------------------------------------------------------------------------
 
 switch plan
     case 0 %Earth
@@ -62,7 +78,11 @@ switch plan
         image = 'https://static.wikia.nocookie.net/planet-texture-maps/images/6/64/Pluto_Made.png/revision/latest?cb=20190331055010';  
     case 10 %Sun
         R = 696340;                                       % [km]
-        image = 'https://www.solarsystemscope.com/textures/download/2k_sun.jpg';  
+        image = 'https://www.solarsystemscope.com/textures/download/2k_sun.jpg';
+    case 11 %Asteroid
+        R = 100.2;                                       % [km]
+        image = 'https://img.freepik.com/free-photo/close-up-various-types-mold-nature_23-2149006048.jpg';
+        
 
 end     
 
@@ -73,13 +93,15 @@ end
 
 switch unid
     case "KM"
-        R = R;
+        R = R  /5000
     case "AU"
         R = R / 149597870.7;
     case "RE"
         R = R / 6371;
     case "M"
         R = R / 1000;
+    case "~"
+        R = R;
     otherwise
         error("Unid not defined, must be capital letters.");
 end
