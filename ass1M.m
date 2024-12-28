@@ -334,7 +334,7 @@ y_ast     = [ r3; v3f ];
 % Plot
 n = astroConstants(2);
 
-figure('Name', 'Heliocentric trajectory', 'NumberTitle', 'on', 'Position', [0, 250, 600, 400], 'Color', [1 1 1]);
+figure('Name', 'Heliocentric trajectory', 'NumberTitle', 'on', 'Position', [0, 250, 500, 500], 'Color', [1 1 1]);
 plot3(Y_mercury(:,1)/n, Y_mercury(:,2)/n, Y_mercury(:,3)/n, 'LineWidth', 1, 'Color', [0.6350 0.0780 0.1840]);
 hold on;
 plot3(Y_leg1(:,1)/n, Y_leg1(:,2)/n, Y_leg1(:,3)/n,'LineWidth', 1, 'Color', [0.4940 0.1840 0.5560]); 
@@ -342,9 +342,12 @@ plot3(Y_earth(:,1)/n, Y_earth(:,2)/n, Y_earth(:,3)/n,'LineWidth', 1, 'Color', [0
 plot3(Y_leg2(:,1)/n, Y_leg2(:,2)/n, Y_leg2(:,3)/n, 'LineWidth', 1, 'Color', [0.4660 0.6740 0.1880]); 
 plot3(Y_ast(:,1)/n, Y_ast(:,2)/n, Y_ast(:,3)/n, 'LineWidth', 1, 'Color', [0.8500 0.3250 0.0980]); 
 
-%Planet3d(10, [0, 0, 0]);                        % Sun
-%Planet3d(2, (Y_mercury(end, 1:3) / n)*100);     % Mercury
-%Planet3d(0, (Y_earth(end, 1:3) / n)*10);        % Earth
+
+Planet3d(10, [0, 0, 0], '~', 0.0931);     % Sun scaled to 20 times its size in AU for visualization purposes only.
+Planet3d(2, [Y_mercury(end,1)/n, Y_mercury(end,2)/n, Y_mercury(24833,3)/n], '~', 0.0489);     % Mercury scaled to 3000 times its size in AU for visualization purposes only.
+Planet3d(0, [Y_earth(500,1)/n, Y_earth(500,2)/n, Y_earth(1,3)/n], '~', 0.0426);        % Eart scaled to 1000 times its size in AU for visualization purposes only.
+Planet3d(11, [Y_ast(end,1)/n, Y_ast(end,2)/n, Y_ast(1,3)/n], '~', 0.0200);        % Asteroid just for visualization purposes only.
+
 
 xlabel('X [AU]');
 ylabel('Y [AU]');
@@ -353,7 +356,7 @@ title('Heliocentric trajectory');
 axis([-2.5 2.5 -2.5 2.5 -2.5 2.5]);
 grid on;
 
-legend("Mercury's orbit", "Transfer orbit to Earth", "Earth's orbit", "Transfer orbit to the asteroid", "Asteroid's orbit");
+legend("Mercury's orbit", "Transfer orbit to Earth", "Earth's orbit", "Transfer orbit to the asteroid", "Asteroid's orbit", 'Location', 'northeast');
 hold off;
 
 %% Fly-by trajectory (planetocentric)
@@ -396,14 +399,23 @@ y0p = [r0; vp];
 [t_fb_min, Y_fb_min  ] = ode113(@(t, y) ode_2bp(t, y, muE), tspan_m, y0m, options_fb);
 [t_fb_plus, Y_fb_plus] = ode113(@(t, y) ode_2bp(t, y, muE), tspan_p, y0p, options_fb);
 
+% Generar puntos para las asíntotas
+scale_asymptote = 500 ; % Escala para extender las asíntotas (en km)
+r_asymptote_m_start = r0/Re+r0/Re; % Inicio de la asíntota en el periapsis
+r_asymptote_m_end = r0/Re + scale_asymptote * a_hyp/b_hyp; % Extremo de la asíntota
+r_asymptote_p_start = r0/Re + r0/Re; % Inicio de la asíntota en el periapsis
+r_asymptote_p_end = r0/Re + scale_asymptote * dir_asymptote_p; % Extremo de la asíntota
+
+
+
 % Plot
-figure('Name', 'Fly-by trajectory (planetocentric)', 'NumberTitle', 'on', 'Position', [400, 250, 400, 400], 'Color', [1 1 1]);
+figure('Name', 'Fly-by trajectory (planetocentric)', 'NumberTitle', 'on', 'Position', [500, 250, 400, 400], 'Color', [1 1 1]);
 hold on;
 
 plot3(Y_fb_min(:, 1) / Re, Y_fb_min(:, 2) / Re, Y_fb_min(:, 3) / Re, 'Color', [0.4940 0.1840 0.5560], 'LineWidth', 1.5, 'DisplayName', 'Flyby hyperbola (infront)');
 plot3(Y_fb_plus(:, 1) / Re, Y_fb_plus(:, 2) / Re, Y_fb_plus(:, 3) / Re, 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 1.5);
-plot3(0, 0, 0, 'yo', 'MarkerSize', 15, 'MarkerFaceColor', 'blue');
-%Planet3d(0, [0, 0, 0],0.5); 
+%plot3(0, 0, 0, 'yo', 'MarkerSize', 15, 'MarkerFaceColor', 'blue');
+Planet3d(0, [0, 0, 0], 'RE'); 
 
 view(3);
 
@@ -420,20 +432,17 @@ zlim([-10, 10]);
 
 %% Porkchop patches
 % Windows for pork-chop to work
-step_plot = 27;
+step_plot = 25;
 
-lower_ga 
-            upper_ga
-
-w_dep_plot = w_dep(1) : step_plot : w_dep(end);
-w_fb_plot = w_fb(1) : step_plot : w_fb(end);
-w_arr_plot = w_arr(1) : step_plot : w_arr(end);
+w_dep_plot = lower_ga(1) : step_plot : upper_ga(1);
+w_fb_plot = lower_ga(2) : step_plot : upper_ga(2);
+w_arr_plot = lower_ga(3) : step_plot : upper_ga(3);
 
 [delta_v1, delta_v2] = porkchop(w_dep_plot, w_fb_plot, w_fb_plot, w_arr_plot);
 
 [w_dep_datenum, w_fb_datenum, w_arr_datenum, t_opt_datenum] = datedata(w_dep_plot, w_fb_plot, w_arr_plot, t_opt_sol);
 
-figure('Name', 'Pork chop plot contour from Mercury to Earth', 'NumberTitle', 'on', 'Position', [800, 0, 400, 350], 'Color', [1 1 1])
+figure('Name', 'Pork chop plot contour from Mercury to Earth', 'NumberTitle', 'on', 'Position', [900, 0, 400, 350], 'Color', [1 1 1])
 hold on
 grid on
 title('Pork chop plot contour from Mercury to Earth')
@@ -451,7 +460,7 @@ plot(t_opt_datenum(1), t_opt_datenum(2), 'ro', 'MarkerSize', 10)
 legend('Chosen time window');
 hold off
 
-figure('Name', 'Pork chop plot contour from Earth to Asteroid', 'NumberTitle', 'on', 'Position', [800, 350, 400, 350], 'Color', [1 1 1])
+figure('Name', 'Pork chop plot contour from Earth to Asteroid', 'NumberTitle', 'on', 'Position', [900, 300, 400, 350], 'Color', [1 1 1])
 hold on
 grid on
 title('Pork chop plot contour from Earth to Asteroid')
@@ -468,4 +477,53 @@ plot(t_opt_datenum(3), t_opt_datenum(2), 'ro', 'MarkerSize', 10)
 legend('Chosen time window');
 hold off
 
+%% PorkChop plot
 
+
+% 3D Pork Chop Plot: Mercury to Earth
+figure('Name', '3D Pork chop plot: Mercury to Earth', 'NumberTitle', 'on', 'Position', [0, -30, 500, 300], 'Color', [1 1 1])
+hold on
+grid on
+title('3D Pork chop plot: Mercury to Earth')
+xlabel('Time of arrival [MJD2000]')
+ylabel('Time of departure [MJD2000]')
+zlabel('Delta V [km/s]')
+[X, Y] = meshgrid(linspace(min(w_arr_datenum), max(w_arr_datenum), 50), ...
+                  linspace(min(w_fb_datenum), max(w_fb_datenum), 50));
+delta_v_interp = interp2(w_arr_datenum, w_fb_datenum, delta_v2, X, Y, 'spline');
+surf(X, Y, delta_v_interp, 'EdgeColor', 'k', 'FaceAlpha', 0.5);
+colormap parula
+colorbar
+%caxis([min(delta_v1(:)), max(delta_v1(:))])
+datetick('x', 'dd/mm/yyyy', 'keepticks', 'keeplimits')
+datetick('y', 'dd/mm/yyyy', 'keepticks', 'keeplimits')
+set(gca, 'XTickLabelRotation', 45)
+set(gca, 'YTickLabelRotation', 45)
+%plot3(t_opt_datenum(1), t_opt_datenum(2), min(delta_v1(:)), 'ro', 'MarkerSize', 10, 'LineWidth', 2)
+view(3)
+%legend('Chosen time window', 'Location', 'northeast');
+hold off
+
+ 
+figure('Name', '3D Pork chop plot: Earth to Asteroid', 'NumberTitle', 'on', 'Position', [400, -30, 500, 300], 'Color', [1 1 1])
+hold on
+grid on
+title('3D Pork chop plot: Earth to Asteroid')
+xlabel('Time of arrival [MJD2000]')
+ylabel('Time of departure [MJD2000]')
+zlabel('Delta V [km/s]')
+[X, Y] = meshgrid(linspace(min(w_arr_datenum), max(w_arr_datenum), 50), ...
+                  linspace(min(w_fb_datenum), max(w_fb_datenum), 50));
+delta_v_interp = interp2(w_arr_datenum, w_fb_datenum, delta_v2, X, Y, 'spline');
+surf(X, Y, delta_v_interp, 'EdgeColor', 'k', 'FaceAlpha', 0.5);
+colormap parula
+colorbar
+%caxis([min(delta_v2(:)), max(delta_v2(:))])
+datetick('x', 'dd/mm/yyyy', 'keepticks', 'keeplimits')
+datetick('y', 'dd/mm/yyyy', 'keepticks', 'keeplimits')
+set(gca, 'XTickLabelRotation', 45)
+set(gca, 'YTickLabelRotation', 45)
+%plot3(t_opt_datenum(3), t_opt_datenum(2), min(delta_v2(:)), 'ro', 'MarkerSize', 10, 'LineWidth', 2)
+view(3)
+%legend('Chosen time window', 'Location', 'northeast');
+hold off
