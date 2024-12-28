@@ -18,7 +18,8 @@ function a = a3B_M(t, r, mu_M, date)
 %
 % INPUT: 
 %   t [1x1]       Time of evaluation                            [s]
-%   r [3x1]       Cartesian coordinates of the body at time t   [km]
+%   r [3x1]       Position of the body at time t in Cartesian 
+%                 coordinates                                   [km]
 %   mu_M [1x1]    Gravitational parameter of the Moon           [km^3/s^2]   
 %	date[1x6]     Date in the Gregorian calendar, as a 6-element vector 
 %                 [year, month, day, hour, minute, second]
@@ -37,11 +38,11 @@ function a = a3B_M(t, r, mu_M, date)
 % Conversion of date in Gregorian calendar to date in MJD 2000
 MJD2000 = date2mjd2000(date) + t/(60*60*24);
 
-% Computation of Moon's position vector in cartesian coordinates, expressed
+% Computation of Moon's position vector in Cartesian coordinates, expressed
 % in Geocentric Equatorial reference frame
 [rE_M, ~] = ephMoon(MJD2000);
 
-% Position vector of the body with respect to Moon
+% Position vector of the body with respect to Moon in Cartesian coordinates
 rSC_M = rE_M' - r;
 
 % Perturbing acceleration acting on the bpdy
