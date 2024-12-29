@@ -83,9 +83,9 @@ for k = 1:length(tv)
 end
 
 
-% aspetta1 = GroundTrack(Yout(1:3, :), thetaG0, tv, wE, 1);
+% aspetta1 = GroundTrack(Yout(1:3, :), thetaG0, tv, wE);
 % 
-% dontneed = GroundTrack(Youtp(1:3, :), thetaG0, tv, wE, 1);
+% dontneed = GroundTrack(Youtp(1:3, :), thetaG0, tv, wE);
 
 %% Orbit propagation using Gauss
 [ToutKEP, KEPout] = ode113 (@(t,kep)  Gauss_TNH(t, kep, muE, RE, J2, muM, date), tv, kep0, options);
@@ -94,7 +94,7 @@ KEPout = KEPout';
 % [ToutKEP_RSW, KEPout_RSW] = ode113 (@(t,kep)  Gauss_RSW(t, kep, muE, RE, J2, muM, date), tv, kep0, options);
 % KEPout_RSW = KEPout_RSW';
 % 
-% whoareu = GroundTrackKEP(KEPout, thetaG0, tv, wE, muE, 1);
+% whoareu = GroundTrackKEP(KEPout, thetaG0, tv, wE, muE);
 
 %% %% Repeating ground track
 % k = 13;
@@ -115,8 +115,8 @@ KEPout = KEPout';
 % Tout_rp = Tout_rp'; % [1xl] row vector
 % Yout_rp = Yout_rp'; % [6xl] row vector
 % 
-% [alpha, delta, lon, lat] = GroundTrack(Youtr(1:3, :), thetaG0, tvr, wE, 1);
-% [alpha, delta, lon, lat] = GroundTrack(Yout_rp(1:3, :), thetaG0, tvr, wE, 1);
+% [alpha, delta, lon, lat] = GroundTrack(Youtr(1:3, :), thetaG0, tvr, wE);
+% [alpha, delta, lon, lat] = GroundTrack(Yout_rp(1:3, :), thetaG0, tvr, wE);
 
 %% PART 4: PLOT OF KEPLERIAN ELEMENTS
 figure
