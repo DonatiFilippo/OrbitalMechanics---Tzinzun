@@ -63,7 +63,7 @@ end
 % Latitude 
 lat = delta;
 
-% Conversion to deg for plot and results readability
+% Conversion  for plot and results readability
 lon = rad2deg(lon);
 lat = rad2deg(lat);
 
