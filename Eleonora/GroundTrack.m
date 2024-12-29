@@ -1,24 +1,29 @@
-function [alpha, delta, lon, lat] = GroundTrack(r, thetaG0, tv, wE)
+function [alpha, delta, lon, lat] = GroundTrack(s, thetaG0, tv, wE)
 
 % GroundTrack - Computation of latitude, longitude and ground track plot 
 % over time interval tv.
 %
 % PROTOTYPE:
-%   [alpha, delta, lon, lat] = GroundTrack(y, thetaG0, t, wE)
+%   [alpha, delta, lon, lat] = GroundTrack(r, thetaG0, tv, wE)
 %
 % DESCRIPTION:
 %   The function computes latitude, longitude, right ascension and
 %   declination and plots the ground track of an object over the time span
-%   tv. r is the object's position in Cartesian coordinates propagated
-%   over the time span.
+%   tv. s can be both the object's position in Cartesian coordinates or
+%   the keplerian elements of the trajectory, propagated over the time span.
 %
 % INPUT: 
-%   r [3xn]         Position of the body over time span tv
-%                   (rx, ry, rz)                                  [km]
-%   thetaG0 [1x1]   Greenwich sidereal time at t0                 [rad]
+%   s [3xn]         Position over time span tv 
+%                   in Cartesian coordinates (rx, ry, rz)      [km]
+%     or
+%
+%   s[6xn]          Keplerian elements over time span tv
+%                   (a, e, i, OM, om, theta)                   [km, -, rad]
+%
+%   thetaG0 [1x1]   Greenwich sidereal time at t0              [rad]
 %                   (beginning of computation)
-%   tv [1xn]        Time span of orbit propagation                [s]
-%   wE [1x1]        Earth's rotation velocity                     [rad/s]
+%   tv [1xn]        Time span of orbit propagation             [s]
+%   wE [1x1]        Earth's rotation velocity                  [rad/s]
 %
 % OUTPUT:
 %   alpha [1xn]     Right ascension in ECI in time span tv        [rad]
@@ -34,8 +39,23 @@ function [alpha, delta, lon, lat] = GroundTrack(r, thetaG0, tv, wE)
 %
 %-------------------------------------------------------------------------
 
-% Vectors initialization
+% Variable extraction
 n = length(tv);
+
+if size(s, 1) == 6
+    kep = s;
+    r = zeros(3,n);
+    
+    % Obtain r
+    for k = 1:n
+        r(:,k) = parorb2rv (kep(1,k), kep(2,k), kep(3,k), kep(4,k), kep(5,k), kep(6,k), muE);
+    end
+
+elseif size(s,1) == 3
+    r = s;
+end
+
+% Vectors initialization
 delta = zeros(1, n);
 alpha = zeros (1, n);
 lon = zeros (1, n);
