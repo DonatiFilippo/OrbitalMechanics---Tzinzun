@@ -33,55 +33,6 @@ r = zeros(3,n);
 for k = 1:n
     r(:,k) = parorb2rv (kep(1,k), kep(2,k), kep(3,k), kep(4,k), kep(5,k), kep(6,k), muE);
 end
-% Compute right ascension and declination in time
-delta = zeros(1, n);
-alpha = zeros (1, n);
-lon = zeros (1, n);
 
-for i = 1:n
-    r_norm = norm(r(:, i));
-    delta(i) = asin(r(3,i)/r_norm);
-    alpha(i) = atan2(r(2,i), r(1, i));
 
-    % Longitude
-    thetaG = thetaG0 + wE*tv(i);
-    lon(i) = (alpha(i) - thetaG);
 
-    if ((lon(i) < -pi) || (lon(i) > pi))
-        lon(i) = mod(lon(i)+pi, 2*pi) - pi; % to put it in the interval -pi, pi
-    end
-
-end
-
-% Compute latitude 
-lat = delta;
-
-% Rad to deg conversion for plot and results readability
-lon = rad2deg(lon);
-lat = rad2deg(lat);
-
-% Ground track plot
-S = imread("EarthTexture.jpg");
-
-figure
-image([-180, 180], [90, -90], S);
-hold on;
-grid minor;
-
-% Green ground track is the non repeated one, red is the repeated one
-if c == 1 
-    plot(lon, lat, 'g', 'LineStyle','none','Marker','.');
-else 
-    plot(lon, lat, 'r', 'LineStyle','none','Marker','.');
-end
-
-plot(lon(1,1), lat(1,1), 'ko', 'LineWidth', 2)
-plot(lon(1,end), lat(1,end), 'ks', 'LineWidth', 2)
-set(gca, 'YDir', 'normal')
-
-xlabel("Longitude [deg]");
-ylabel("Latitude [deg]");
-legend("Ground track", "Start", "End");
-end
-
-% TOGLIERE C PERCHE' è INUTILE
