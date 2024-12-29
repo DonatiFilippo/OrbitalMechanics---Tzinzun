@@ -16,7 +16,7 @@ function thetaG0 = thetaG0_computation(J0, UT, w_E)
 %   w_E [1x1]       Earth's rotation angular velocity               [rad/s]
 %
 % OUTPUT:
-%   thetaG0 [1x1]   Greenwich Local Sideral Time at a give Date       [rad]
+%   thetaG0 [1x1]   Greenwich Local Sideral Time at a give Date       [deg]
 %
 % CONTRIBUTORS:
 %   Azevedo Da Silva Esteban
@@ -32,10 +32,8 @@ w_E = rad2deg(w_E) * 3600;
 % Evaluate the number of century passed since J2000
 T0 = (J0 - 2451545)/36525;
 
-% Evaluate the desired Greenwich Local Sideral Time
+% Evaluate the desired Greenwich Sideral Loc
 thetaG_t0 = wrapTo360(100.4606184 + 36000.77004*T0 + 0.000387933*(T0^2) - 2.583*(10^-8)*(T0^3));
-
-% Wrap and convert the result to radiants
 thetaG0 = wrapTo360(thetaG_t0 + w_E*UT);
 thetaG0 = deg2rad(thetaG0);
 end
