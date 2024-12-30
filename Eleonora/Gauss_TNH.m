@@ -1,7 +1,7 @@
 function dkep = Gauss_TNH(t, kep, mu, R, J2, muM, date)
 
 % Gauss_TNH - Gauss planetary equation with perturbing acceleration in TNH 
-% tangential-normal-out of plane) reference frame
+% (tangential-normal-out of plane) reference frame
 %
 % PROTOTYPE:
 %   dkep = Gauss_TNH(t, kep, mu, R, J2, muM, date)
