@@ -10,7 +10,7 @@ function [alpha, delta, lon, lat] = GroundTrack(s, thetaG0, tv, wE)
 %   The function computes latitude, longitude, right ascension and
 %   declination and plots the ground track of an object over the time span
 %   tv. s can be both the object's position in Cartesian coordinates or
-%   the keplerian elements, propagated over the time span.
+%   the Keplerian elements, propagated over the time span.
 %
 % INPUT: 
 %   s [3xn]         Position over time span tv 
