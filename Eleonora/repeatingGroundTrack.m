@@ -1,4 +1,4 @@
-function [a] = repeatingGroundTrack(m, k, wE, mu)
+function [a] = a_repeatingGT(m, k, wE, mu)
 % repeatingGroundTrack computes the required semi-major axis a for a
 % repeating ground track given m and k
 %
