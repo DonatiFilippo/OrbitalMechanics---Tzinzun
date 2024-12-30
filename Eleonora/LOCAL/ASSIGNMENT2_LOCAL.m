@@ -99,7 +99,7 @@ KEPout = KEPout';
 %% %% Repeating ground track
 % k = 13;
 % m = 3;
-% ar = repeatingGroundTrack(m, k, wE, muE);
+% ar = a_repeatingGT(m, k, wE, muE);
 % 
 % Tr =  2*pi*sqrt(ar^3/muE);
 % tvr = linspace(t0, 10*24*60*60, 10000);
