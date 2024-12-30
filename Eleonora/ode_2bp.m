@@ -15,7 +15,7 @@ function dy = ode_2bp(~, y, mu_E)
 % mu[1]    Gravitational parameter of the primary             [km^3/s^2]
 %
 % OUTPUT: 
-% dy[6X1]  Derivative of the state [L/T, L/T^2]
+% dy[6X1]  Derivative of the state                            [km/s, km/s^2]
 %
 % CONTRIBUTORS:
 %   Azevedo Da Silva Esteban
