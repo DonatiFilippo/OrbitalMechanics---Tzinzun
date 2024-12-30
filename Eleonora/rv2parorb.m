@@ -1,74 +1,90 @@
 function [a, e, i, OM, om, theta] = rv2parorb(rr, vv, mu)
 
-%Transformation from Cartesian state to orbital elements
+% rv2parorb - Convert Cartesian state vectors to Keplerian elements.
 %
-%Input arguments:
-%rr             [3x1]  position vector              [km]
-%vv             [3x1]  velocity vector              [km/s]
-%mu             [1x1]  gravitational parameter      [km^3/s^2]
+% PROTOTYPE: 
+%   [a, e, i, OM, om, theta] = rv2parorb(rr, vv, mu)
 %
-%-------------------------------------------------------------------------
-%Output arguments:
-%a              [1x1]  semi-major axis              [km]
-%e              [1x1]  eccentricity                 [-]
-%i              [1x1]  inclination                  [rad]
-%OM             [1x1]  RAAN                         [rad]
-%om             [1x1]  pericenter anomaly           [rad]
-%theta          [1x1]  true anomaly                 [rad]
+% DESCRIPTION:
+%   The function converts position and velocity vectors in Cartesian
+%   coordinates to Keplerian elements.
+%
+% INPUT:
+%   rr [3x1]      Position vector in Cartesian coordinates    [km]
+%   vv [3x1]      Velocity vector in Cartesian coordinates    [km/s] 
+%   mu [1x1]      Gravitational parameter of the primary      [km^3/s^2]
+%
+% OUTPUT:
+%   a [1x1]       Semi-major axis                             [km]
+%   e [1x1]       Eccentricity                                [-]
+%   i [1x1]       Inclination                                 [rad]
+%   OM [1x1]      Right ascension of ascending node           [rad]
+%   om [1x1]      Pericenter anomaly                          [rad]
+%   theta [1x1]   True anomaly                                [rad]
+%
+% CONTRIBUTORS:
+%   Azevedo Da Silva Esteban
+%   Gavidia Pantoja Maria Paulina
+%   Donati Filippo 
+%   Domenichelli Eleonora
+%
 %-------------------------------------------------------------------------
 
-%versori del sistema geocentrico
+% Unit vectors of Geocentric Equatorial reference frame
 I=[1; 0; 0];
 J=[0; 1; 0];
 K=[0; 0; 1];
 
-%moduli dei vettori posizione (rr) e velocità (vv)
+% Magnitude of position (rr) and velocity (vv) vectors
 r=norm(rr);
 v=norm(vv);
 
-v_r=dot(rr,vv)/r; %velocità radiale
+% Radial component of velocity
+v_r=dot(rr,vv)/r;
 
-%emiasse maggiore a dalla formula dell'energia
+% Semi-major axis obtained from energy definition
 a=1/(2/r-(v^2)/mu);
 
-hh=cross(rr,vv); %vettore momento angolare
-h=norm(hh); %modulo del vettore momento angolare
-i=acos(dot(hh,K)/h); %inclinazione
+% Specific angular momentum vector and magnitude computation
+hh=cross(rr,vv);
+h=norm(hh);
 
-%se l'orbita è equatoriale poniamo NN=I, l'ascensione retta del nodo
-%ascendente risulterà nulla
+% Inclination computation
+i=acos(dot(hh,K)/h);
+
+% Node line vector and magnitudde computation, considering the particular
+% case where inclination is 0 (so OM will be zero)
 if (i == 0) 
     NN=I;
 else
-    NN=cross(K,hh); %linea dei nodi
+    NN=cross(K,hh);
 end
-N=norm(NN); %magnitude of node vector
+N=norm(NN);
 
-%ascensione retta del nodo ascendente
+% Right ascension of ascending node
 if(dot(NN,J)>=0)
     OM=acos(dot(NN,I)/N);
 else
     OM=2*pi-acos(dot(NN,I)/N);
 end
 
-%eccentricità
+% Eccentricity vector and magnitude computation, considering the particular
+% case of circular orbits (e = 0)
 ee=(cross(vv,hh))/mu-(rr/r);
 
-%se l'orbita è circolare (e=0) poniamo il vettore eccentricità coincidente
-%con la linea dei nodi
 if (norm(ee) <= 1e-8)
     ee=NN;
 end
 e=norm(ee);
 
-%argomento del pericentro
+% Pericenter anomaly
 if(dot(ee,K)>=0)
     om=acos(dot(NN,ee)/(N*e));
 else
     om=2*pi-acos(dot(NN,ee)/(N*e));
 end
 
-%anomalia vera
+% True anomaly
 if(v_r>=0)
     theta=acos(dot(ee,rr)/(e*r));
 else
