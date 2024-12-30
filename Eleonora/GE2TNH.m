@@ -27,7 +27,7 @@ function A_TNH = GE2TNH(y)
 %                 (rx, ry, rz, vx, vy, vz)                       [km, km/s]
 %
 % OUTPUT:
-%   A_TNH [3x3]    Rotation matrix                               [km/s^2]
+%   A_TNH [3x3]    Rotation matrix                               [-]
 %
 % CONTRIBUTORS:
 %   Azevedo Da Silva Esteban
