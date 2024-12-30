@@ -1,22 +1,27 @@
 function dy = ode_2bp(~, y, mu_E)
-%ode_2bp ODE system for the two-body problem (Keplerian motion)
+
+% ode_2bp - ODE system for the two-body problem
 %
 % PROTOTYPE:
 %  dy = ode_2bp(t, y, mu)
 %
+% DESCRIPTION:
+%   The function gives the ODE system for the not perturbed two-body
+%   problem.
+%
 % INPUT:
-% t[1]     Time (can be omitted as the system is autonomous)  [T]
-% y[6x1]   State of the body ( rx, ry, rz, vx, vy, vz)        [L, L/T]
-% mu[1]    Gravitational parameter of the primary             [L^3/T2]
+% t[1]     Time (can be omitted as the system is autonomous)  [s]
+% y[6x1]   State of the body ( rx, ry, rz, vx, vy, vz)        [km, km/s]
+% mu[1]    Gravitational parameter of the primary             [km^3/s^2]
 %
 % OUTPUT: 
 % dy[6X1]  Derivative of the state [L/T, L/T^2]
 %
 % CONTRIBUTORS:
-%  Eleonora Domenichelli
-%
-% VERSION:
-%  2024/10/14: First version
+%   Azevedo Da Silva Esteban
+%   Gavidia Pantoja Maria Paulina
+%   Donati Filippo 
+%   Domenichelli Eleonora
 %
 %-------------------------------------------------------------------------
 
