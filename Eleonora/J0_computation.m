@@ -17,7 +17,7 @@ function [J0, UT] = J0_computation(jd, date)
 %                   Julian proleptic calendar. The corresponding date 
 %                   in Gregorian calendar is 12:00 noon, 24 November -4713.
 %
-%   date [6x1]      Date in the Gregorian calendar, as a 6-elements vector
+%   date [1x6]      Date in the Gregorian calendar, as a 6-elements vector
 %                   [year, month, day, hour, minute, second]. For dates 
 %                   before 1582, the resulting date components are valid 
 %                   only in the Gregorian proleptic calendar. This is based
