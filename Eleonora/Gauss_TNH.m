@@ -14,6 +14,11 @@ function dkep = Gauss_TNH(t, kep, mu, R, J2, muM, date)
 %   of plane) reference frame. The perturbing accelerations are computed
 %   directly inside this function using the auxiliary functions a3B_M and
 %   aJ2.
+%   {t, n, h} is characterised by:
+%       t-axis: on the orbit plane, along the direction of the velocity
+%       h-axis: out of plane, along the direction of the angular momentum
+%       of the orbit
+%       n-axis: on the orbit plane, completes the reference frame
 %
 % INPUT:
 %   t [1x1]       Time instant for acceleration evaluation       [s]
