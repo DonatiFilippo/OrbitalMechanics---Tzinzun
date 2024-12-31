@@ -51,11 +51,11 @@ plot3(r_GE(1,:), r_GE(2,:), r_GE(3,:),'LineWidth',2)
 
 else
     % Option 2: if mod == 1 the orbit is dashed in black
-    if mod == 1 %dashed orbit in black
+    if mod == 1 
         plot3(r_GE(1,:), r_GE(2,:), r_GE(3,:),'k--')
 
     % Option 3: if mod == 2 the orbit is in continuous colored line and
-    % with eccentricity vector and starting point represented 
+    % with eccentricity vector and pericenter represented 
     elseif mod == 2 
         plot3(r_GE(1,:), r_GE(2,:), r_GE(3,:),'LineWidth',2)
 
@@ -67,7 +67,7 @@ else
         plot3(ev(1),ev(2),ev(3),'oy','LineWidth', 6)
     
     % Option 4: if mod == 3 the orbit is dashed in black with eccentricity
-    % vector and starting point represented
+    % vector and pericenter represented
     elseif mod == 3
         plot3(r_GE(1,:), r_GE(2,:), r_GE(3,:),'k--')
 
