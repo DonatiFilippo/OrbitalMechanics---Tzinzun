@@ -151,7 +151,7 @@ Y3r = Y3r';
 title('Repeating ground track for T = 30');
 
 %% GROUND TRACK OF NOMINAL PERTURBED ORBIT
-% Propagation for the nominal non perturbed case
+% Propagation for the nominal perturbed case
 % T = 1
 [~, Y1p] = ode113 (@(t,y) ode_2bp_perturbed(t, y, muE, muM, RE, J2, date), tv1, y0, options); 
 Y1p = Y1p'; 
@@ -172,3 +172,221 @@ Y3p = Y3p';
 
 [~, ~, ~, ~] = GroundTrack(Y3p(1:3, :), thetaG0, tv3, wE);
 title('Ground track for perturbed orbit for T = 30');
+
+%% GROUND TRACK OF REPEATING PERTURBED ORBIT
+% Propagation for the repeating perturbed case
+% T = 1
+[~, Y1rp] = ode113 (@(t,y) ode_2bp_perturbed(t, y, muE, muM, RE, J2, date), tv1r, y0r, options); 
+Y1rp = Y1rp'; 
+
+[~, ~, ~, ~] = GroundTrack(Y1rp(1:3, :), thetaG0, tv1r, wE);
+title('Repeating ground track for perturbed orbit for T = 1');
+
+% T = 13
+[~, Y2rp] = ode113 (@(t,y) ode_2bp_perturbed(t, y, muE, muM, RE, J2, date), tv2r, y0r, options);
+Y2rp = Y2rp';
+
+[~, ~, ~, ~] = GroundTrack(Y2rp(1:3, :), thetaG0, tv2r, wE);
+title('Repeating ground track for perturbed orbit for T = 13');
+
+% T = 30
+[~, Y3rp] = ode113 (@(t,y) ode_2bp_perturbed(t, y, muE, muM, RE, J2, date), tv3r, y0r, options); 
+Y3rp = Y3rp';
+
+[~, ~, ~, ~] = GroundTrack(Y3rp(1:3, :), thetaG0, tv3r, wE);
+title('Repeating ground track for perturbed orbit for T = 30');
+
+%% PROPAGATION OF NOMINAL PERTURBED ORBIT WITH DIFFERENT METHODS
+% Setting the time span for the propagation
+tv = linspace(0, 100*T, N);
+
+% Propagation in Cartesian coordinates
+[TC, Y] = ode113 (@(t,y) ode_2bp_perturbed(t, y, muE, muM, RE, J2, date), tv, y0, options); 
+Y = Y';
+TC = TC';
+
+% Keplerian elements recovery
+for k = 1:N
+    [a_car(k), e_car(k), i_car(k), OM_car(k), om_car(k), theta_car(k)] = rv2parorb(Y(1:3, k), Y(4:end, k), muE);
+end
+OM_car = unwrap(OM_car);
+om_car = unwrap(om_car);
+theta_car = unwrap(theta_car);
+
+% Propagation of Keplerian elements using Gauss' equations
+[TKEP, KEP] = ode113 (@(t,kep)  Gauss_TNH(t, kep, muE, RE, J2, muM, date), tv, kep0, options);
+KEP = KEP';
+TKEP = TKEP';
+
+%% PROPAGATION METHODS COMPARISON
+% Conversion to degrees of Keplerian elements obtained from Cartesian
+% coordinates propagation for readability
+i_car = rad2deg(i_car);
+OM_car = rad2deg(OM_car);
+om_car = rad2deg(om_car);
+theta_car = rad2deg(theta_car);
+
+% Conversion to degrees of Keplerian elements obtained from Gauss'
+% equations propagation
+KEP(3:6, :) = rad2deg(KEP(3:6, :));
+
+% Conversion to degrees of nominal Keplerian elements
+kep0(3:6) = rad2deg(kep0(3:6));
+
+% Evolutions over time of Keplerian elements obtained with both methods and
+% comparison
+% -------------------------------------------------------------------------
+
+% Semi-major axis
+figure
+plot(TC/T, a_car, 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('a_c_a_r [km]')
+title("Evolution of semi-major axis Cartesian method")
+
+figure
+plot(TKEP/T, KEP(1,:), 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('a_g_a_u_s_s [km]')
+title("Evolution of semi-major axis Gauss method")
+
+figure
+plot(TKEP/T, abs(a_car-KEP(1,:))/kep0(1), 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('|a_c_a_r - a_g_a_u_s_s|/a0 [-]')
+title("Semi-major axis' relative error")
+
+% -------------------------------------------------------------------------
+
+% Eccentricity
+figure
+plot(TC/T, e_car, 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('e_c_a_r [-]')
+title("Evolution of eccentricity Cartesian method")
+
+figure
+plot(TKEP/T, KEP(2,:), 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('e_g_a_u_s_s [-]')
+title("Evolution of eccentricity Gauss method")
+
+figure
+plot(TKEP/T, abs(e_car-KEP(2,:)), 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('|e_c_a_r - e_g_a_u_s_s| [-]')
+title("Eccentricity's absolute error")
+
+% -------------------------------------------------------------------------
+
+% Inclination
+figure
+plot(TC/T, i_car, 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('i_c_a_r [deg]')
+title("Evolution of inclination Cartesian method")
+
+figure
+plot(TKEP/T, KEP(3,:), 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('i_g_a_u_s_s [deg]')
+title("Evolution of inclination Gauss method")
+
+figure
+plot(TKEP/T, abs(i_car-KEP(3,:))/(2*pi), 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('|i_c_a_r - i_g_a_u_s_s|/2π [-]')
+title("Inclination's relative error")
+
+% -------------------------------------------------------------------------
+
+% Right ascension of ascending node
+figure
+plot(TC/T, OM_car, 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('Ω_c_a_r [deg]')
+title("Evolution of RAAN Cartesian method")
+
+figure
+plot(TKEP/T, KEP(4,:), 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('Ω_g_a_u_s_s [deg]')
+title("Evolution of RAAN Gauss method")
+
+figure
+plot(TKEP/T, abs(OM_car-KEP(4,:))/(2*pi), 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('|Ω_c_a_r - Ω_g_a_u_s_s|/2π [-]')
+title("RAAN's relative error")
+
+% -------------------------------------------------------------------------
+
+% Pericenter anomaly
+figure
+plot(TC/T, om_car, 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('ω_c_a_r [deg]')
+title("Evolution of pericenter anomaly Cartesian method")
+
+figure
+plot(TKEP/T, KEP(5,:), 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('ω_g_a_u_s_s [deg]')
+title("Evolution of pericenter anomaly Gauss method")
+
+figure
+plot(TKEP/T, abs(om_car-KEP(5,:))/(2*pi), 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('|ω_c_a_r - ω_g_a_u_s_s|/2π [-]')
+title("Pericenter anomaly's relative error")
+
+% -------------------------------------------------------------------------
+
+% True anomaly
+figure
+plot(TC/T, theta_car, 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('θ_c_a_r [deg]')
+title("Evolution of true anomaly Cartesian method")
+
+figure
+plot(TKEP/T, KEP(6,:), 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('θ_g_a_u_s_s [deg]')
+title("Evolution of true anomaly Gauss method")
+
+figure
+plot(TKEP/T, abs(theta_car-KEP(6,:))/(2*pi), 'b-')
+grid on
+xlabel('Time [T]')
+ylabel('|θ_c_a_r - θ_g_a_u_s_s|/2π [-]')
+title("Pericenter anomaly's relative error")
+
+%% ORBIT'S EVOLUTION
+Earth_3D
+hold on
+scatter3(Y(1,:), Y(2,:), Y(3,:), 10, TC/T, 'filled');
+colormap;
+a = colorbar;
+a.Label.String = "Time [T]";
+xlabel('X [km]'); ylabel('Y [km]'); zlabel('Z [km]');
+title('Perturbed two-body problem orbit');
+axis equal;
+grid on;
