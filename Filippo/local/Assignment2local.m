@@ -204,10 +204,11 @@ title("theta");
 %%
 Earth_3D;
 hold on
-scatter3( keple(:,1), keple(:,2), keple(:,3),10, tuc./T, 'filled');
+scatter3( keple(:,1), keple(:,2), keple(:,3), 10, tuc./T, 'filled');
 colormap;
 a = colorbar;
-a.Label.String = "Orbital Periods";
+a.Title.String = "Orbital Periods [T]";
+clim([0 50]);
 xlabel('X [km]'); ylabel('Y [km]'); zlabel('Z [km]');
 title('Two-body problem orbit');
 axis equal;
