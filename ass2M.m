@@ -70,12 +70,12 @@ plot0rbit(a, e, i, OM, om, th0, thf, dth, muE, 2);
 legend('', 'Orbit', 'Pericenter', 'Eccentricity');
 title('Nominal orbit');
 
-%% GROUND TRACK OF NOMINAL NON PERTURBED ORBIT
 % Computation of GST (thetaG0) for our simulation
 jd = date2jd(date);
 [J0, UT] = J0_computation(jd, date);
 thetaG0 = thetaG0_computation(J0, UT, wE);
 
+%% GROUND TRACK OF NOMINAL NON PERTURBED ORBIT
 % Initialization of propagation's time intervals
 N = 100000;
 tv1 = linspace(0, T, N);
@@ -119,7 +119,7 @@ Tr =  2*pi*sqrt(ar^3/muE); % Repeating orbit's period [s]
 Earth_3D
 hold on
 plot0rbit(ar, e, i, OM, om, th0, thf, dth, muE, 2);
-legend('-', 'Orbit', 'Pericenter', 'Eccentricity');
+legend('', 'Orbit', 'Pericenter', 'Eccentricity');
 title('Repeating orbit');
 
 %% GROUND TRACK OF REPEATING NON PERTURBED ORBIT
@@ -128,6 +128,9 @@ N = 100000;
 tv1r = linspace(0, Tr, N);
 tv2r = linspace(0, 13*Tr, N);
 tv3r = linspace(0, 30*Tr, N);
+
+% Setting options for the ODE solver
+options = odeset('RelTol', 1e-13, 'AbsTol', 1e-14);
 
 % Propagation for the repeating non perturbed case
 % T = 1
@@ -200,7 +203,11 @@ title('Repeating ground track for perturbed orbit for T = 30');
 %% PROPAGATION OF NOMINAL PERTURBED ORBIT WITH DIFFERENT METHODS
 % Setting the time span for the propagation
 N = 100000;
-tv = linspace(0, 100*T, N);
+n_orb = 500;
+tv = linspace(0, n_orb*T, N);
+
+% Setting options for the ODE solver
+options = odeset('RelTol', 1e-13, 'AbsTol', 1e-14);
 
 % Propagation in Cartesian coordinates
 [TC, Y] = ode113 (@(t,y) ode_2bp_perturbed(t, y, muE, muM, RE, J2, date), tv, y0, options); 
@@ -208,8 +215,8 @@ Y = Y';
 TC = TC';
 
 % Keplerian elements recovery
-for k = 1:N
-    [a_car(k), e_car(k), i_car(k), OM_car(k), om_car(k), theta_car(k)] = rv2parorb(Y(1:3, k), Y(4:end, k), muE);
+for l = 1:N
+    [a_car(l), e_car(l), i_car(l), OM_car(l), om_car(l), theta_car(l)] = rv2parorb(Y(1:3, l), Y(4:end, l), muE);
 end
 OM_car = unwrap(OM_car);
 om_car = unwrap(om_car);
@@ -220,7 +227,6 @@ theta_car = unwrap(theta_car);
 KEP = KEP';
 TKEP = TKEP';
 
-%% PROPAGATION METHODS COMPARISON
 % Conversion to degrees of Keplerian elements obtained from Cartesian
 % coordinates propagation for readability
 i_car = rad2deg(i_car);
@@ -232,9 +238,7 @@ theta_car = rad2deg(theta_car);
 % equations propagation
 KEP(3:6, :) = rad2deg(KEP(3:6, :));
 
-% Conversion to degrees of nominal Keplerian elements
-kep0(3:6) = rad2deg(kep0(3:6));
-
+%% PROPAGATION METHODS COMPARISON
 % Evolutions over time of Keplerian elements obtained with both methods and
 % comparison
 % -------------------------------------------------------------------------
@@ -243,6 +247,7 @@ kep0(3:6) = rad2deg(kep0(3:6));
 figure
 plot(TC/T, a_car, 'b-')
 grid on
+xlim([0 n_orb])
 xlabel('Time [T]')
 ylabel('a_c_a_r [km]')
 title("Evolution of semi-major axis Cartesian method")
@@ -250,13 +255,15 @@ title("Evolution of semi-major axis Cartesian method")
 figure
 plot(TKEP/T, KEP(1,:), 'b-')
 grid on
+xlim([0 n_orb])
 xlabel('Time [T]')
 ylabel('a_g_a_u_s_s [km]')
 title("Evolution of semi-major axis Gauss method")
 
 figure
-plot(TKEP/T, abs(a_car-KEP(1,:))/kep0(1), 'b-')
+semilogy(TKEP/T, abs(a_car-KEP(1,:))/kep0(1), 'b-')
 grid on
+xlim([0 n_orb])
 xlabel('Time [T]')
 ylabel('|a_c_a_r - a_g_a_u_s_s|/a0 [-]')
 title("Semi-major axis' relative error")
@@ -267,6 +274,7 @@ title("Semi-major axis' relative error")
 figure
 plot(TC/T, e_car, 'b-')
 grid on
+xlim([0 n_orb])
 xlabel('Time [T]')
 ylabel('e_c_a_r [-]')
 title("Evolution of eccentricity Cartesian method")
@@ -274,13 +282,15 @@ title("Evolution of eccentricity Cartesian method")
 figure
 plot(TKEP/T, KEP(2,:), 'b-')
 grid on
+xlim([0 n_orb])
 xlabel('Time [T]')
 ylabel('e_g_a_u_s_s [-]')
 title("Evolution of eccentricity Gauss method")
 
 figure
-plot(TKEP/T, abs(e_car-KEP(2,:)), 'b-')
+semilogy(TKEP/T, abs(e_car-KEP(2,:)), 'b-')
 grid on
+xlim([0 n_orb])
 xlabel('Time [T]')
 ylabel('|e_c_a_r - e_g_a_u_s_s| [-]')
 title("Eccentricity's absolute error")
@@ -291,6 +301,7 @@ title("Eccentricity's absolute error")
 figure
 plot(TC/T, i_car, 'b-')
 grid on
+xlim([0 n_orb])
 xlabel('Time [T]')
 ylabel('i_c_a_r [deg]')
 title("Evolution of inclination Cartesian method")
@@ -298,13 +309,15 @@ title("Evolution of inclination Cartesian method")
 figure
 plot(TKEP/T, KEP(3,:), 'b-')
 grid on
+xlim([0 n_orb])
 xlabel('Time [T]')
 ylabel('i_g_a_u_s_s [deg]')
 title("Evolution of inclination Gauss method")
 
 figure
-plot(TKEP/T, abs(i_car-KEP(3,:))/(2*pi), 'b-')
+semilogy(TKEP/T, abs(i_car-KEP(3,:))/(2*pi), 'b-')
 grid on
+xlim([0 n_orb])
 xlabel('Time [T]')
 ylabel('|i_c_a_r - i_g_a_u_s_s|/2π [-]')
 title("Inclination's relative error")
@@ -315,6 +328,8 @@ title("Inclination's relative error")
 figure
 plot(TC/T, OM_car, 'b-')
 grid on
+xlim([0 50])
+ylim([OM_car(N/500 * 50) OM_car(1)])
 xlabel('Time [T]')
 ylabel('Ω_c_a_r [deg]')
 title("Evolution of RAAN Cartesian method")
@@ -322,13 +337,16 @@ title("Evolution of RAAN Cartesian method")
 figure
 plot(TKEP/T, KEP(4,:), 'b-')
 grid on
+xlim([0 50])
+ylim([KEP(4, (N/500 * 50)) KEP(4,1)])
 xlabel('Time [T]')
 ylabel('Ω_g_a_u_s_s [deg]')
 title("Evolution of RAAN Gauss method")
 
 figure
-plot(TKEP/T, abs(OM_car-KEP(4,:))/(2*pi), 'b-')
+semilogy(TKEP/T, abs(OM_car-KEP(4,:))/(2*pi), 'b-')
 grid on
+xlim([0 50])
 xlabel('Time [T]')
 ylabel('|Ω_c_a_r - Ω_g_a_u_s_s|/2π [-]')
 title("RAAN's relative error")
@@ -339,6 +357,8 @@ title("RAAN's relative error")
 figure
 plot(TC/T, om_car, 'b-')
 grid on
+xlim([0 50])
+ylim([om_car(1) om_car(N/500 * 50)])
 xlabel('Time [T]')
 ylabel('ω_c_a_r [deg]')
 title("Evolution of pericenter anomaly Cartesian method")
@@ -346,13 +366,16 @@ title("Evolution of pericenter anomaly Cartesian method")
 figure
 plot(TKEP/T, KEP(5,:), 'b-')
 grid on
+xlim([0 50])
+ylim([KEP(5,1) KEP(5, (N/500 * 50))])
 xlabel('Time [T]')
 ylabel('ω_g_a_u_s_s [deg]')
 title("Evolution of pericenter anomaly Gauss method")
 
 figure
-plot(TKEP/T, abs(om_car-KEP(5,:))/(2*pi), 'b-')
+semilogy(TKEP/T, abs(om_car-KEP(5,:))/(2*pi), 'b-')
 grid on
+xlim([0 50])
 xlabel('Time [T]')
 ylabel('|ω_c_a_r - ω_g_a_u_s_s|/2π [-]')
 title("Pericenter anomaly's relative error")
@@ -363,6 +386,8 @@ title("Pericenter anomaly's relative error")
 figure
 plot(TC/T, theta_car, 'b-')
 grid on
+xlim([0 50])
+ylim([theta_car(1) theta_car(N/500 * 50)])
 xlabel('Time [T]')
 ylabel('θ_c_a_r [deg]')
 title("Evolution of true anomaly Cartesian method")
@@ -370,13 +395,16 @@ title("Evolution of true anomaly Cartesian method")
 figure
 plot(TKEP/T, KEP(6,:), 'b-')
 grid on
+xlim([0 50])
+ylim([KEP(6,1) KEP(6, (N/500 * 50))])
 xlabel('Time [T]')
 ylabel('θ_g_a_u_s_s [deg]')
 title("Evolution of true anomaly Gauss method")
 
 figure
-plot(TKEP/T, abs(theta_car-KEP(6,:))/(2*pi), 'b-')
+semilogy(TKEP/T, abs(theta_car-KEP(6,:))/(2*pi), 'b-')
 grid on
+xlim([0 50])
 xlabel('Time [T]')
 ylabel('|θ_c_a_r - θ_g_a_u_s_s|/2π [-]')
 title("Pericenter anomaly's relative error")
@@ -408,4 +436,85 @@ axis equal;
 grid on;
 
 %% FILTERING
-% 
+% Necessary to retrieve long time period and secular evolutions of orbital
+% elements
+
+% Semi-major axis
+a_s = movmean(KEP(1,:), N/n_orb);
+
+figure
+plot(TKEP/T, KEP(1,:), 'b-', TKEP/T, a_s, 'r-', 'LineWidth', 2)
+grid on
+xlim([0 n_orb])
+xlabel('Time [T]')
+ylabel('a [km]')
+title("Semi-major axis")
+legend('Complete', 'Secular')
+
+% Eccentricity
+e_lt = movmean(KEP(2,:), N/n_orb);
+e_s = movmean(KEP(2,:), N*2/30);
+
+figure
+plot(TKEP/T, KEP(2,:), 'b-', TKEP/T, e_lt, 'g-', TKEP/T, e_s, 'r-', 'LineWidth', 2)
+grid on
+xlim([0 n_orb])
+xlabel('Time [T]')
+ylabel('e [-]')
+title("Eccentricity")
+legend('Complete', 'Long term', 'Secular')
+
+% Inclination
+i_lt = movmean(KEP(3,:), N/n_orb);
+i_s = movmean(KEP(3,:), N*2/30);
+
+figure
+plot(TKEP/T, KEP(3,:), 'b-', TKEP/T, i_lt, 'g-', TKEP/T, i_s, 'r-', 'LineWidth', 2)
+grid on
+xlim([0 n_orb])
+xlabel('Time [T]')
+ylabel('i [deg]')
+title("Inclination")
+legend('Complete', 'Long term', 'Secular')
+
+% RAAN
+OM_s = movmean(KEP(4,:), N/n_orb);
+
+figure
+plot(TKEP/T, KEP(4,:), 'b-', TKEP/T, OM_s, 'r-', 'LineWidth', 2)
+grid on
+xlim([0 50])
+ylim([KEP(4, (N/500 * 50)) KEP(4,1)])
+xlabel('Time [T]')
+ylabel('Ω [deg]')
+title("RAAN")
+legend('Complete', 'Secular')
+
+% Pericenter anomaly
+om_lt = movmean(KEP(5,:), N/n_orb);
+om_s = movmean(KEP(5,:), N*2/30);
+
+figure
+plot(TKEP/T, KEP(5,:), 'b-', TKEP/T, om_lt, 'g-', TKEP/T, om_s, 'r-','LineWidth', 2)
+grid on
+xlim([0 100])
+ylim([KEP(5,1) KEP(5, (N/500 * 100))])
+xlabel('Time [T]')
+ylabel('ω [deg]')
+title("Pericenter anomaly")
+legend('Complete', 'Long term', 'Secular')
+
+% True anomaly
+theta_s = movmean(KEP(6,:), N/n_orb);
+
+figure
+plot(TKEP/T, KEP(6,:), 'b-', TKEP/T, theta_s, 'r-', 'LineWidth', 2)
+grid on
+xlim([0 50])
+ylim([KEP(6,1) KEP(6, (N/500 * 50))])
+xlabel('Time [T]')
+ylabel('θ [deg]')
+title("True anomaly")
+legend('Complete', 'Secular')
+
+%% REAL DATA ANALYSIS
