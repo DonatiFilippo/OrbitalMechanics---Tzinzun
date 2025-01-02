@@ -116,6 +116,12 @@ y0r = [r0r; v0r];
 
 Tr =  2*pi*sqrt(ar^3/muE); % Repeating orbit's period [s]
 
+% Check that our repeating orbit remains inside the SOI of Earth
+r_SOI = 145.3 * RE; % Radius of earth's SOI [km]
+ra = ar*(1+e); % Apogee radius [km]
+% it can be seen that ra << r_SOI, so we don't have to redefine k and m to
+% have our orbit inside the sphere of influence of the Earth
+
 Earth_3D
 hold on
 plot0rbit(ar, e, i, OM, om, th0, thf, dth, muE, 2);
