@@ -67,7 +67,7 @@ dth = 0.1; % Resolution [rad]
 Earth_3D
 hold on
 plot0rbit(a, e, i, OM, om, th0, thf, dth, muE, 2);
-legend('-', 'Orbit', 'Pericenter', 'Eccentricity');
+legend('', 'Orbit', 'Pericenter', 'Eccentricity');
 title('Nominal orbit');
 
 %% GROUND TRACK OF NOMINAL NON PERTURBED ORBIT
@@ -124,6 +124,7 @@ title('Repeating orbit');
 
 %% GROUND TRACK OF REPEATING NON PERTURBED ORBIT
 % Initialization of propagation's time intervals
+N = 100000;
 tv1r = linspace(0, Tr, N);
 tv2r = linspace(0, 13*Tr, N);
 tv3r = linspace(0, 30*Tr, N);
@@ -198,6 +199,7 @@ title('Repeating ground track for perturbed orbit for T = 30');
 
 %% PROPAGATION OF NOMINAL PERTURBED ORBIT WITH DIFFERENT METHODS
 % Setting the time span for the propagation
+N = 100000;
 tv = linspace(0, 100*T, N);
 
 % Propagation in Cartesian coordinates
@@ -380,13 +382,30 @@ ylabel('|θ_c_a_r - θ_g_a_u_s_s|/2π [-]')
 title("Pericenter anomaly's relative error")
 
 %% ORBIT'S EVOLUTION
+% ATTENZIONE: LA RAPPRESENTAZIONE DELL'ORBITA PUO' ESSERE MIGLIORATA
+% Setting the time span for the propagation
+n_orbits = 1000;
+tv_plot = linspace(0, n_orbits*T, N);
+
+% Propagation in Cartesian coordinates
+[T_plot, Y_plot] = ode113 (@(t,y) ode_2bp_perturbed(t, y, muE, muM, RE, J2, date), tv_plot, y0, options); 
+Y_plot = Y_plot';
+T_plot = T_plot';
+
+
 Earth_3D
 hold on
-scatter3(Y(1,:), Y(2,:), Y(3,:), 10, TC/T, 'filled');
+scatter3(Y_plot(1,:), Y_plot(2,:), Y_plot(3,:), 5, T_plot./T, 'filled');
 colormap;
 a = colorbar;
-a.Label.String = "Time [T]";
-xlabel('X [km]'); ylabel('Y [km]'); zlabel('Z [km]');
+a.Title.String = "Orbital period [T]";
+clim([1 n_orbits]);
+xlabel('X [km]'); 
+ylabel('Y [km]');
+zlabel('Z [km]');
 title('Perturbed two-body problem orbit');
 axis equal;
 grid on;
+
+%% FILTERING
+% 
