@@ -60,13 +60,13 @@ theta = kep(6);
 % Conversion of Keplerian parameters to radius and velocity vectors
 % in Cartesian coordinates
 [rp, vp] =  parorb2rv (a, e, i, OM, om, theta, mu);
-
+yp = [rp; vp];
 % Evaluate perturbing acceleration, expressed in Geocentric equatorial
 % reference frame
 ap_ECI = aJ2(rp, mu, R, J2) + a3B_M(t, rp, muM, date);
 
 % Acceleration's rotation in TNH reference frame
-ap = GE2TNH(rp, vp) * ap_ECI;
+ap = GE2TNH(yp) * ap_ECI;
 
 % Computation of useful values for equations readability
 p = a*(1-e^2);
