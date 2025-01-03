@@ -524,3 +524,173 @@ title("True anomaly")
 legend('Complete', 'Secular')
 
 %% REAL DATA ANALYSIS
+% Data import
+data = importdata("ENVISAT_241101_241112.txt");
+kep_envisat = [data.data(:,10), data.data(:,1), data.data(:,3), data.data(:,4), data.data(:,5), data.data(:,9)];
+
+% Date of beginning of propagation
+date_Env = [2024, 11, 1, 0, 0, 0];
+
+% Setting the time interval for the propagation
+t_span = 0:300:950400;
+
+% Setting options for the ODE solver
+options = odeset('RelTol', 1e-13, 'AbsTol', 1e-14);
+
+kep_envisat0 = [kep_envisat(1, 1:2), deg2rad(kep_envisat(1, 3:6))];
+
+% Propagation of Keplerian elements using Gauss' equation
+[TPROP, KEP_Envisat] = ode113 (@(t,kep)  Gauss_TNH(t, kep, muE, RE, J2, muM, date_Env), t_span, kep_envisat0, options);
+KEP_Envisat = KEP_Envisat';
+TPROP = TPROP';
+
+% Conversion to degrees of Keplerian elements obtained from Gauss'
+% equations propagation
+KEP_Envisat(3:6, :) = rad2deg(KEP_Envisat(3:6, :));
+
+%% Plot to compare HORIZONS and our propagator
+%Semi-major axis
+figure
+plot(TPROP, kep_envisat(:,1), 'r-', TPROP, KEP_Envisat(1, :), 'b-')
+grid on
+% xlim([0 n_orb])
+xlabel('Time [s]')
+ylabel('a [km]')
+title("Evolution of semi-major axis")
+legend('a_e_p_h_e_m', 'a_G_a_u_s_s')
+
+%Eccentricity
+figure
+plot(TPROP, kep_envisat(:,2), 'r-', TPROP, KEP_Envisat(2, :), 'b-')
+grid on
+% xlim([0 n_orb])
+xlabel('Time [s]')
+ylabel('e [-]')
+title("Evolution of eccentricity")
+legend('e_e_p_h_e_m', 'e_G_a_u_s_s')
+
+%inclination
+figure
+plot(TPROP, unwrap(kep_envisat(:,3)), 'r-', TPROP, KEP_Envisat(3, :), 'b-')
+grid on
+% xlim([0 n_orb])
+xlabel('Time [s]')
+ylabel('i [deg]')
+title("Evolution of inclination")
+legend('i_e_p_h_e_m', 'i_G_a_u_s_s')
+
+%RAAN
+figure
+plot(TPROP, unwrap(kep_envisat(:,4)), 'r-', TPROP, KEP_Envisat(4, :), 'b-')
+grid on
+% xlim([0 n_orb])
+xlabel('Time [s]')
+ylabel('OM [deg]')
+title("Evolution of RAAN")
+legend('OM_e_p_h_e_m', 'OM_G_a_u_s_s')
+
+%Pericenter anomaly
+figure
+plot(TPROP, unwrap(kep_envisat(:,5)), 'r-', TPROP, KEP_Envisat(5, :), 'b-')
+grid on
+% xlim([0 n_orb])
+xlabel('Time [s]')
+ylabel('om [deg]')
+title("Evolution of pericenter anomaly")
+legend('om_e_p_h_e_m', 'om_G_a_u_s_s')
+
+%Pericenter anomaly
+figure
+plot(TPROP, unwrap(kep_envisat(:,6)), 'r-', TPROP, KEP_Envisat(6, :), 'b-')
+grid on
+% xlim([0 n_orb])
+xlabel('Time [s]')
+ylabel('theta [deg]')
+title("Evolution of true anomaly")
+legend('theta_e_p_h_e_m', 'theta_G_a_u_s_s')
+
+%% REAL DATA ANALYSIS 2
+% Data import
+data = importdata("CHINASAT_31days.txt");
+kep_envisat = [data.data(:,10), data.data(:,1), data.data(:,3), data.data(:,4), data.data(:,5), data.data(:,9)];
+
+% Date of beginning of propagation
+date_Env = [2024, 10, 1, 0, 0, 0];
+
+% Setting the time interval for the propagation
+t_span = 0:300:(31*24*60*60);
+
+% Setting options for the ODE solver
+options = odeset('RelTol', 1e-13, 'AbsTol', 1e-14);
+
+kep_envisat0 = [kep_envisat(1, 1:2), deg2rad(kep_envisat(1, 3:6))];
+
+% Propagation of Keplerian elements using Gauss' equation
+[TPROP, KEP_Envisat] = ode113 (@(t,kep)  Gauss_TNH(t, kep, muE, RE, J2, muM, date_Env), t_span, kep_envisat0, options);
+KEP_Envisat = KEP_Envisat';
+TPROP = TPROP';
+
+% Conversion to degrees of Keplerian elements obtained from Gauss'
+% equations propagation
+KEP_Envisat(3:6, :) = rad2deg(KEP_Envisat(3:6, :));
+
+%% Plot to compare HORIZONS and our propagator
+%Semi-major axis
+figure
+plot(TPROP, kep_envisat(:,1), 'r-', TPROP, KEP_Envisat(1, :), 'b-')
+grid on
+% xlim([0 n_orb])
+xlabel('Time [s]')
+ylabel('a [km]')
+title("Evolution of semi-major axis")
+legend('a_e_p_h_e_m', 'a_G_a_u_s_s')
+
+%Eccentricity
+figure
+plot(TPROP, kep_envisat(:,2), 'r-', TPROP, KEP_Envisat(2, :), 'b-')
+grid on
+% xlim([0 n_orb])
+xlabel('Time [s]')
+ylabel('e [-]')
+title("Evolution of eccentricity")
+legend('e_e_p_h_e_m', 'e_G_a_u_s_s')
+
+%inclination
+figure
+plot(TPROP, kep_envisat(:,3), 'r-', TPROP, KEP_Envisat(3, :), 'b-')
+grid on
+% xlim([0 n_orb])
+xlabel('Time [s]')
+ylabel('i [deg]')
+title("Evolution of inclination")
+legend('i_e_p_h_e_m', 'i_G_a_u_s_s')
+
+%RAAN
+figure
+plot(TPROP, kep_envisat(:,4), 'r-', TPROP, KEP_Envisat(4, :), 'b-')
+grid on
+% xlim([0 n_orb])
+xlabel('Time [s]')
+ylabel('OM [deg]')
+title("Evolution of RAAN")
+legend('OM_e_p_h_e_m', 'OM_G_a_u_s_s')
+
+%Pericenter anomaly
+figure
+plot(TPROP, unwrap(kep_envisat(:,5)), 'r-', TPROP, KEP_Envisat(5, :), 'b-')
+grid on
+% xlim([0 n_orb])
+xlabel('Time [s]')
+ylabel('om [deg]')
+title("Evolution of pericenter anomaly")
+legend('om_e_p_h_e_m', 'om_G_a_u_s_s')
+
+%True anomaly
+figure
+plot(TPROP/(2*pi*sqrt(kep_envisat0(1)^3/muE)), unwrap(kep_envisat(:,6)), 'r-', TPROP/(2*pi*sqrt(kep_envisat0(1)^3/muE)), KEP_Envisat(6, :), 'b-')
+grid on
+% xlim([0 n_orb])
+xlabel('Time [s]')
+ylabel('theta [deg]')
+title("Evolution of true anomaly")
+legend('theta_e_p_h_e_m', 'theta_G_a_u_s_s')
