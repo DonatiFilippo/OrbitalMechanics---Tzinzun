@@ -529,81 +529,6 @@ legend('Complete', 'Secular')
 
 %% REAL DATA ANALYSIS
 % Data import IRIDIUM 33 DEBRIS
-data = importdata("IRIDIUM33_3MONTHS_10min.txt");
-kep1 = [data.data(:,10), data.data(:,1), data.data(:,3), data.data(:,4), data.data(:,5), data.data(:,9)];
-
-% Setting the time interval for the propagation
-t_span = 0:600:(90*24*60*60);
-
-% Plot
-% Semi-major axis
-figure
-plot(t_span, kep1(:, 1), 'b-')
-grid on
-xlim([0 t_span(end)])
-ylim([min(kep1(:, 1)) max(kep1(:, 1))])
-xlabel('Time [s]')
-ylabel('a [km]')
-title("Evolution of semi-major axis")
-legend('a_e_p_h_e_m')
-
-% Eccentricity
-figure
-plot(t_span, kep1(:,2), 'b-')
-grid on
-xlim([0 t_span(end)])
-ylim([min(kep1(:, 2)) max(kep1(:, 2))])
-xlabel('Time [s]')
-ylabel('e [-]')
-title("Evolution of eccentricity")
-legend('e_e_p_h_e_m')
-
-% Inclination
-figure
-plot(t_span, (kep1(:,3)), 'b-')
-grid on
-xlim([0 t_span(end)])
-ylim([min(kep1(:, 3)) max(kep1(:, 3))])
-xlabel('Time [s]')
-ylabel('i [deg]')
-title("Evolution of inclination")
-legend('i_e_p_h_e_m')
-
-% RAAN
-figure
-plot(t_span, kep1(:,4),'b-')
-grid on
-xlim([0 t_span(end)])
-ylim([min(kep1(:, 4)) max(kep1(:, 4))])
-xlabel('Time [s]')
-ylabel('Ω [deg]')
-title("Evolution of RAAN")
-legend('Ω_e_p_h_e_m')
-
-% Pericenter anomaly
-figure
-plot(t_span, unwrap(kep1(:,5)), 'b-', t_span, kep1(:,5), 'r-');
-grid on
-xlim([0 t_span(end)])
-%ylim([min(unwrap(kep1(:, 5))) max(unwrap(kep1(:, 5)))])
-xlabel('Time [s]')
-ylabel('ω [deg]')
-title("Evolution of pericenter anomaly")
-legend('ω_e_p_h_e_m')
-
-% True anomaly
-figure
-plot(t_span, unwrap(kep1(:,6)), 'b-')
-grid on
-xlim([0 t_span(end)])
-%ylim([min(kep1(:, 6)) max(kep1(:, 6))])
-xlabel('Time [s]')
-ylabel('θ [deg]')
-title("Evolution of true anomaly")
-legend('θ_e_p_h_e_m')
-
-%% REAL DATA ANALYSIS
-% Data import IRIDIUM 33 DEBRIS
 data = importdata("IRIDIUM_APRGIU.txt");
 kep1 = [data.data(:,10), data.data(:,1), data.data(:,3), data.data(:,4), data.data(:,5), data.data(:,9)];
 
@@ -656,6 +581,7 @@ title("Evolution of RAAN")
 legend('Ω_e_p_h_e_m')
 
 % Pericenter anomaly
+kep1(:,5) = rad2deg(unwrap(deg2rad(kep1(:,5))));
 figure
 plot(t_span, unwrap(kep1(:,5)), 'b-', t_span, kep1(:,5), 'r-');
 grid on
@@ -668,7 +594,7 @@ legend('ω_e_p_h_e_m')
 
 % True anomaly
 figure
-plot(t_span, unkep1(:,6)), 'b-')
+plot(t_span, kep1(:,6), 'b-')
 grid on
 xlim([0 t_span(end)])
 %ylim([min(kep1(:, 6)) max(kep1(:, 6))])
