@@ -80,7 +80,7 @@ thetaG0 = thetaG0_computation(J0, UT, wE);
 N = 100000;
 tv1 = linspace(0, T, N);
 tv2 = linspace(0, 13*T, N);
-tv3 = linspace(0, 30*T, N); % WE CAN CHANGE IT?
+tv3 = linspace(0, 30*T, N);
 
 % Setting options for the ODE solver
 options = odeset('RelTol', 1e-13, 'AbsTol', 1e-14);
@@ -91,21 +91,21 @@ options = odeset('RelTol', 1e-13, 'AbsTol', 1e-14);
 Y1 = Y1';
 
 [~, ~, ~, ~] = GroundTrack(Y1(1:3, :), thetaG0, tv1, wE);
-title('Ground track for T = 1');
+title('Ground track T = 1');
 
 % T = 13
 [~, Y2] = ode113 (@(t,y) ode_2bp(t,y,muE), tv2, y0, options);
 Y2 = Y2';
 
 [~, ~, ~, ~] = GroundTrack(Y2(1:3, :), thetaG0, tv2, wE);
-title('Ground track for T = 13');
+title('Ground track T = 13');
 
 % T = 30
 [~, Y3] = ode113 (@(t,y) ode_2bp(t,y,muE), tv3, y0, options); 
 Y3 = Y3';
 
 [~, ~, ~, ~] = GroundTrack(Y3(1:3, :), thetaG0, tv3, wE);
-title('Ground track for T = 30');
+title('Ground track T = 30');
 
 %% REPEATING ORBIT CHARACTERISATION
 % New semi-major axis to obtain repeating ground track
@@ -167,21 +167,21 @@ title('Repeating ground track for T = 30');
 Y1p = Y1p'; 
 
 [~, ~, ~, ~] = GroundTrack(Y1p(1:3, :), thetaG0, tv1, wE);
-title('Ground track for perturbed orbit for T = 1');
+title('Ground track of perturbed orbit T = 1');
 
 % T = 13
 [~, Y2p] = ode113 (@(t,y) ode_2bp_perturbed(t, y, muE, muM, RE, J2, date), tv2, y0, options);
 Y2p = Y2p';
 
 [~, ~, ~, ~] = GroundTrack(Y2p(1:3, :), thetaG0, tv2, wE);
-title('Ground track for perturbed orbit for T = 13');
+title('Ground track of perturbed orbit T = 13');
 
 % T = 30
 [~, Y3p] = ode113 (@(t,y) ode_2bp_perturbed(t, y, muE, muM, RE, J2, date), tv3, y0, options); 
 Y3p = Y3p';
 
 [~, ~, ~, ~] = GroundTrack(Y3p(1:3, :), thetaG0, tv3, wE);
-title('Ground track for perturbed orbit for T = 30');
+title('Ground track of perturbed orbit T = 30');
 
 %% GROUND TRACK OF REPEATING PERTURBED ORBIT
 % Propagation for the repeating perturbed case
@@ -190,21 +190,21 @@ title('Ground track for perturbed orbit for T = 30');
 Y1rp = Y1rp'; 
 
 [~, ~, ~, ~] = GroundTrack(Y1rp(1:3, :), thetaG0, tv1r, wE);
-title('Repeating ground track for perturbed orbit for T = 1');
+title('Repeating ground track of perturbed orbit T = 1');
 
 % T = 13
 [~, Y2rp] = ode113 (@(t,y) ode_2bp_perturbed(t, y, muE, muM, RE, J2, date), tv2r, y0r, options);
 Y2rp = Y2rp';
 
 [~, ~, ~, ~] = GroundTrack(Y2rp(1:3, :), thetaG0, tv2r, wE);
-title('Repeating ground track for perturbed orbit for T = 13');
+title('Repeating ground track of perturbed orbit T = 13');
 
 % T = 30
 [~, Y3rp] = ode113 (@(t,y) ode_2bp_perturbed(t, y, muE, muM, RE, J2, date), tv3r, y0r, options); 
 Y3rp = Y3rp';
 
 [~, ~, ~, ~] = GroundTrack(Y3rp(1:3, :), thetaG0, tv3r, wE);
-title('Repeating ground track for perturbed orbit for T = 30');
+title('Repeating ground track of perturbed orbit T = 30');
 
 %% PROPAGATION OF NOMINAL PERTURBED ORBIT WITH DIFFERENT METHODS
 % Setting the time span for the propagation
@@ -216,6 +216,7 @@ tv = linspace(0, n_orb*T, N);
 options = odeset('RelTol', 1e-13, 'AbsTol', 1e-14);
 
 % Propagation in Cartesian coordinates
+tic
 [TC, Y] = ode113 (@(t,y) ode_2bp_perturbed(t, y, muE, muM, RE, J2, date), tv, y0, options); 
 Y = Y';
 TC = TC';
@@ -227,11 +228,14 @@ end
 OM_car = unwrap(OM_car);
 om_car = unwrap(om_car);
 theta_car = unwrap(theta_car);
+toc
 
 % Propagation of Keplerian elements using Gauss' equations
+tic
 [TKEP, KEP] = ode113 (@(t,kep)  Gauss_TNH(t, kep, muE, RE, J2, muM, date), tv, kep0, options);
 KEP = KEP';
 TKEP = TKEP';
+toc
 
 % Conversion to degrees of Keplerian elements obtained from Cartesian
 % coordinates propagation for readability
@@ -334,8 +338,8 @@ title("Inclination's relative error")
 figure
 plot(TC/T, OM_car, 'b-')
 grid on
-xlim([0 50])
-ylim([OM_car(N/500 * 50) OM_car(1)])
+% xlim([0 50])
+% ylim([OM_car(N/500 * 50) OM_car(1)])
 xlabel('Time [T]')
 ylabel('Ω_c_a_r [deg]')
 title("Evolution of RAAN Cartesian method")
@@ -343,8 +347,8 @@ title("Evolution of RAAN Cartesian method")
 figure
 plot(TKEP/T, KEP(4,:), 'b-')
 grid on
-xlim([0 50])
-ylim([KEP(4, (N/500 * 50)) KEP(4,1)])
+% xlim([0 50])
+% ylim([KEP(4, (N/500 * 50)) KEP(4,1)])
 xlabel('Time [T]')
 ylabel('Ω_g_a_u_s_s [deg]')
 title("Evolution of RAAN Gauss method")
@@ -352,7 +356,7 @@ title("Evolution of RAAN Gauss method")
 figure
 semilogy(TKEP/T, abs(OM_car-KEP(4,:))/(2*pi), 'b-')
 grid on
-xlim([0 50])
+% xlim([0 50])
 xlabel('Time [T]')
 ylabel('|Ω_c_a_r - Ω_g_a_u_s_s|/2π [-]')
 title("RAAN's relative error")
@@ -363,8 +367,8 @@ title("RAAN's relative error")
 figure
 plot(TC/T, om_car, 'b-')
 grid on
-xlim([0 50])
-ylim([om_car(1) om_car(N/500 * 50)])
+% xlim([0 50])
+% ylim([om_car(1) om_car(N/500 * 50)])
 xlabel('Time [T]')
 ylabel('ω_c_a_r [deg]')
 title("Evolution of pericenter anomaly Cartesian method")
@@ -372,8 +376,8 @@ title("Evolution of pericenter anomaly Cartesian method")
 figure
 plot(TKEP/T, KEP(5,:), 'b-')
 grid on
-xlim([0 50])
-ylim([KEP(5,1) KEP(5, (N/500 * 50))])
+% xlim([0 50])
+% ylim([KEP(5,1) KEP(5, (N/500 * 50))])
 xlabel('Time [T]')
 ylabel('ω_g_a_u_s_s [deg]')
 title("Evolution of pericenter anomaly Gauss method")
@@ -381,7 +385,7 @@ title("Evolution of pericenter anomaly Gauss method")
 figure
 semilogy(TKEP/T, abs(om_car-KEP(5,:))/(2*pi), 'b-')
 grid on
-xlim([0 50])
+% xlim([0 50])
 xlabel('Time [T]')
 ylabel('|ω_c_a_r - ω_g_a_u_s_s|/2π [-]')
 title("Pericenter anomaly's relative error")
@@ -392,8 +396,8 @@ title("Pericenter anomaly's relative error")
 figure
 plot(TC/T, theta_car, 'b-')
 grid on
-xlim([0 50])
-ylim([theta_car(1) theta_car(N/500 * 50)])
+% xlim([0 50])
+% ylim([theta_car(1) theta_car(N/500 * 50)])
 xlabel('Time [T]')
 ylabel('θ_c_a_r [deg]')
 title("Evolution of true anomaly Cartesian method")
@@ -401,8 +405,8 @@ title("Evolution of true anomaly Cartesian method")
 figure
 plot(TKEP/T, KEP(6,:), 'b-')
 grid on
-xlim([0 50])
-ylim([KEP(6,1) KEP(6, (N/500 * 50))])
+% xlim([0 50])
+% ylim([KEP(6,1) KEP(6, (N/500 * 50))])
 xlabel('Time [T]')
 ylabel('θ_g_a_u_s_s [deg]')
 title("Evolution of true anomaly Gauss method")
@@ -410,7 +414,7 @@ title("Evolution of true anomaly Gauss method")
 figure
 semilogy(TKEP/T, abs(theta_car-KEP(6,:))/(2*pi), 'b-')
 grid on
-xlim([0 50])
+% xlim([0 50])
 xlabel('Time [T]')
 ylabel('|θ_c_a_r - θ_g_a_u_s_s|/2π [-]')
 title("Pericenter anomaly's relative error")
@@ -418,7 +422,7 @@ title("Pericenter anomaly's relative error")
 %% ORBIT'S EVOLUTION
 % ATTENZIONE: LA RAPPRESENTAZIONE DELL'ORBITA PUO' ESSERE MIGLIORATA
 % Setting the time span for the propagation
-n_orbits = 1000;
+n_orbits = 10000;
 tv_plot = linspace(0, n_orbits*T, N);
 
 % Propagation in Cartesian coordinates
@@ -524,90 +528,79 @@ title("True anomaly")
 legend('Complete', 'Secular')
 
 %% REAL DATA ANALYSIS
-% Data import
-data = importdata("ENVISAT_241101_241112.txt");
-kep_envisat = [data.data(:,10), data.data(:,1), data.data(:,3), data.data(:,4), data.data(:,5), data.data(:,9)];
-
-% Date of beginning of propagation
-date_Env = [2024, 11, 1, 0, 0, 0];
+% Data import IRIDIUM 33 DEBRIS
+data = importdata("IRIDIUM33_3MONTHS_10min.txt");
+kep1 = [data.data(:,10), data.data(:,1), data.data(:,3), data.data(:,4), data.data(:,5), data.data(:,9)];
 
 % Setting the time interval for the propagation
-t_span = 0:300:950400;
+t_span = 0:600:(90*24*60*60);
 
-% Setting options for the ODE solver
-options = odeset('RelTol', 1e-13, 'AbsTol', 1e-14);
-
-kep_envisat0 = [kep_envisat(1, 1:2), deg2rad(kep_envisat(1, 3:6))];
-
-% Propagation of Keplerian elements using Gauss' equation
-[TPROP, KEP_Envisat] = ode113 (@(t,kep)  Gauss_TNH(t, kep, muE, RE, J2, muM, date_Env), t_span, kep_envisat0, options);
-KEP_Envisat = KEP_Envisat';
-TPROP = TPROP';
-
-% Conversion to degrees of Keplerian elements obtained from Gauss'
-% equations propagation
-KEP_Envisat(3:6, :) = rad2deg(KEP_Envisat(3:6, :));
-
-%% Plot to compare HORIZONS and our propagator
-%Semi-major axis
+% Plot
+% Semi-major axis
 figure
-plot(TPROP, kep_envisat(:,1), 'r-', TPROP, KEP_Envisat(1, :), 'b-')
+plot(t_span, kep1(:, 1), 'b-')
 grid on
-% xlim([0 n_orb])
+xlim([0 t_span(end)])
+ylim([min(kep1(:, 1)) max(kep1(:, 1))])
 xlabel('Time [s]')
 ylabel('a [km]')
 title("Evolution of semi-major axis")
-legend('a_e_p_h_e_m', 'a_G_a_u_s_s')
+legend('a_e_p_h_e_m')
 
-%Eccentricity
+% Eccentricity
 figure
-plot(TPROP, kep_envisat(:,2), 'r-', TPROP, KEP_Envisat(2, :), 'b-')
+plot(t_span, kep1(:,2), 'b-')
 grid on
-% xlim([0 n_orb])
+xlim([0 t_span(end)])
+ylim([min(kep1(:, 2)) max(kep1(:, 2))])
 xlabel('Time [s]')
 ylabel('e [-]')
 title("Evolution of eccentricity")
-legend('e_e_p_h_e_m', 'e_G_a_u_s_s')
+legend('e_e_p_h_e_m')
 
-%inclination
+% Inclination
 figure
-plot(TPROP, unwrap(kep_envisat(:,3)), 'r-', TPROP, KEP_Envisat(3, :), 'b-')
+plot(t_span, (kep1(:,3)), 'b-')
 grid on
-% xlim([0 n_orb])
+xlim([0 t_span(end)])
+ylim([min(kep1(:, 3)) max(kep1(:, 3))])
 xlabel('Time [s]')
 ylabel('i [deg]')
 title("Evolution of inclination")
-legend('i_e_p_h_e_m', 'i_G_a_u_s_s')
+legend('i_e_p_h_e_m')
 
-%RAAN
+% RAAN
 figure
-plot(TPROP, unwrap(kep_envisat(:,4)), 'r-', TPROP, KEP_Envisat(4, :), 'b-')
+plot(t_span, kep1(:,4),'b-')
 grid on
-% xlim([0 n_orb])
+xlim([0 t_span(end)])
+ylim([min(kep1(:, 4)) max(kep1(:, 4))])
 xlabel('Time [s]')
-ylabel('OM [deg]')
+ylabel('Ω [deg]')
 title("Evolution of RAAN")
-legend('OM_e_p_h_e_m', 'OM_G_a_u_s_s')
+legend('Ω_e_p_h_e_m')
 
-%Pericenter anomaly
+% Pericenter anomaly
 figure
-plot(TPROP, unwrap(kep_envisat(:,5)), 'r-', TPROP, KEP_Envisat(5, :), 'b-')
+plot(t_span, unwrap(kep1(:,5)), 'b-', t_span, kep1(:,5), 'r-');
 grid on
-% xlim([0 n_orb])
+xlim([0 t_span(end)])
+%ylim([min(unwrap(kep1(:, 5))) max(unwrap(kep1(:, 5)))])
 xlabel('Time [s]')
-ylabel('om [deg]')
+ylabel('ω [deg]')
 title("Evolution of pericenter anomaly")
-legend('om_e_p_h_e_m', 'om_G_a_u_s_s')
+legend('ω_e_p_h_e_m')
 
-%Pericenter anomaly
+% True anomaly
 figure
-plot(TPROP, unwrap(kep_envisat(:,6)), 'r-', TPROP, KEP_Envisat(6, :), 'b-')
+plot(t_span, unwrap(kep1(:,6)), 'b-')
 grid on
-% xlim([0 n_orb])
+xlim([0 t_span(end)])
+%ylim([min(kep1(:, 6)) max(kep1(:, 6))])
 xlabel('Time [s]')
-ylabel('theta [deg]')
+ylabel('θ [deg]')
 title("Evolution of true anomaly")
-legend('theta_e_p_h_e_m', 'theta_G_a_u_s_s')
+legend('θ_e_p_h_e_m')
 
 %% REAL DATA ANALYSIS 2
 % Data import
