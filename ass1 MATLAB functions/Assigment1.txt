@@ -1,0 +1,73 @@
+[TEAM 2427 - TZINTZUN]
+----------------------------------------------
+     INTERPLANETARY MISSION ASSIGNMENT        
+----------------------------------------------
+
+Mercury to Asteroid no.30 w flyby on Earth
+Mission Window : [2030 1 1 0 0 0] - [2060 1 1 0 0 0]
+Displaying synodics period in years :
+
+Mercury's synodic orbital period with respect to Earth : 0.317255 years 
+Earth's synodic orbital period with respect to the asteroid : 1.379125 years 
+Mercury's synodic orbital period with respect to the asteroid : 0.257922 years 
+
+
+Displaying tof of transfer arc for Hohmann transfers in years :
+
+Time of flight of the first transfer arc from Mercury to Earth : 0.288798 years
+Time of flight of the second transfer arc from Earth to the asteroid : 1.091387 years 
+Total time of flight from Mercury to the asteroid : 1.380185 years 
+
+
+
+
+Genetic Algorithm Results:
+
+Departure: 06/02/2053
+Flyby: 27/03/2053
+Arrival: 04/03/2054
+Delta-v: 21.93 km/s
+
+
+FMINCON/Local Refinement Results:
+
+Departure: 06/02/2053
+Flyby: 27/03/2053
+Arrival: 04/03/2054
+Delta-v: 21.93 km/s
+
+
+Refined solution with gradient :
+
+Departure date : 06/02/2053
+Fly-by date: 27/03/2053
+Arrival date : 04/03/2054
+Minimised cost with gradient : 21.928746 km/s 
+
+
+Simulated Annealing Results:
+
+Departure: 06/02/2053 
+Flyby: 27/03/2053 
+Arrival: 04/03/2054 
+Delta-v: 21.93 km/s
+
+
+The final solutions are :
+
+Departure: 06/02/2053 
+Flyby: 27/03/2053 
+Arrival: 04/03/2054 
+Mercury to Earth Orbit: a = -81.69 km, e = 571608.00210, i = 0.83°, Ω = 7.27°, ω = 47.96°, ν = 358.66°
+Earth to Asteroid Orbit: a = -335.19 km, e = 328439.85929, i = 1.56°, Ω = 7.27°, ω = 137.52°, ν = 42.48°
+Delta-v at departure: 13.97 km/s
+Delta-v at arrival: 7.96 km/s
+Delta-v optimal: 21.93 km/s
+Delta-v minimun: 21.93 km/s
+
+
+The altitude of the closest approach is : 2099.729945 km 
+
+The total velocity change due to flyby is : 3.726324 km/s 
+The cost of the manoeuvre at pericentre is : 0.000000 km/s 
+

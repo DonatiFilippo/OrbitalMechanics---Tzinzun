@@ -24,6 +24,7 @@ close all
 if exist(fullfile(cd, 'Assigment1.cvs'), 'file') == 2
     delete(fullfile(cd, 'Assigment1.txt'))
 end
+
 filename = 'Assigment1.txt';
 fileID = fopen(filename,'w+');
 fprintf(fileID,'[TEAM 2427 - TZINTZUN]\n');
@@ -39,29 +40,29 @@ fclose(fileID);
 
 %% IMPOSED DATES
 Departure_date = [2030, 1, 1, 0, 0, 0]; % Earliest departure date [Gregorian date]
-  Arrival_date = [2060, 1, 1, 0, 0, 0]; % Latest arrival date [Gregorian date]
+Arrival_date = [2060, 1, 1, 0, 0, 0];   % Latest arrival date [Gregorian date]
  
 mjd_dep = date2mjd2000(Departure_date); % Earliest departure date converted to modified Julian day 2000
 mjd_arr = date2mjd2000(Arrival_date);   % Latest arrival date converted to modified Julian day 2000
 
 fileID = fopen(filename,'a+');
 fprintf(fileID,'Mercury to Asteroid no.30 w flyby on Earth\n');
-fprintf(fileID,'Mission Window : [%d %d %d %d %d %d] - [%d %d %d %d %d %d]\n',Departure_date,Arrival_date);
+fprintf(fileID,'Mission Window : [%d %d %d %d %d %d] - [%d %d %d %d %d %d]\n', Departure_date, Arrival_date);
 fclose(fileID);
 
 %% PHYSICAL PARAMETERS
-   Departure_planet = 1;  % Mercury as the departure planet 
-       Flyby_planet = 3;  % Earth as the flyby planet
+Departure_planet = 1;     % Mercury as the departure planet 
+Flyby_planet = 3;         % Earth as the flyby planet
 Arrival_asteroid_id = 30; % Asteroid no.30 as the arrival objective
 
-muM = astroConstants(11); % Mercury's gravitational constant [km^3/s^2]
-muE = astroConstants(13); % Earth's gravitational constant [km^3/s^2]
-muS = astroConstants(4);  % Sun's gravitational constant [km^3/s^2]
+muM = astroConstants(11);  % Mercury's gravitational constant [km^3/s^2]
+muE = astroConstants(13);  % Earth's gravitational constant [km^3/s^2]
+muS = astroConstants(4);   % Sun's gravitational constant [km^3/s^2]
 Re  = astroConstants(23);  % Earth's mean radius [km]
 
 % Keplerian elements computing / kep = [a e i Om om theta] [km, rad]
-   [kep_dep, ~] = uplanet(0, Departure_planet);         % Mercury's keplerian elements at initial time
-    [kep_fb, ~] = uplanet(0, Flyby_planet);             % Earth's keplerian elements at initial time
+[kep_dep, ~] = uplanet(0, Departure_planet);            % Mercury's keplerian elements at initial time
+[kep_fb, ~] = uplanet(0, Flyby_planet);                 % Earth's keplerian elements at initial time
 [kep_arr, ~, ~] = ephAsteroids(0, Arrival_asteroid_id); % Asteroid's keplerian elements at initial time
 
 %% PERIODS COMPUTING
@@ -89,8 +90,8 @@ a_t2 = (kep_fb(1) + kep_arr(1))/2; % Semi-major axis of the second transfert arc
 T_t1 = 2*pi*sqrt(a_t1^3/muS); % Period of the first transfer arc [s]
 T_t2 = 2*pi*sqrt(a_t2^3/muS); % Period of the second transfer arc [s]
 
-tof_t1 = 1/2*T_t1 / 86400; % Time of flight of the first transfer arc [days]
-tof_t2 = 1/2*T_t2 / 86400; % Time of flight of the second transfer arc [days]
+tof_t1 = 1/2*T_t1 / 86400;  % Time of flight of the first transfer arc [days]
+tof_t2 = 1/2*T_t2 / 86400;  % Time of flight of the second transfer arc [days]
 tof_h  = (tof_t1 + tof_t2); % Total time of flight for Hohmann transfer [days]
 
 fileID = fopen(filename,'a+');
@@ -101,7 +102,7 @@ fprintf(fileID,'Total time of flight from Mercury to the asteroid : %f years \n'
 fprintf(fileID,'\n\n');
 fclose(fileID);
 
-step = 1; % Step size of days for iterating through time windows
+step = 1;   % Step size of days for iterating through time windows
 SM   = 0.4; % Safety margin for time of flight, 40% adjustment based on bibliography
 
 % Calculate the synodic period with the most relevance
@@ -142,9 +143,9 @@ upper_ga = [w_dep(end) w_fb(end) w_arr(end)];
 options_ga = optimoptions('ga', 'PopulationSize', 300, ...
     'FunctionTolerance', 0.001, 'Display', 'off', 'MaxGenerations', 200);
  
-% Solver
+% Solver for genetic
 N         = ceil((mjd_arr-w_arr_max)/365.25);
-N_ga      = 3;        % Number of genetic algorithm iteration to have better results
+N_ga      = 3;         % Number of genetic algorithm iteration to have better results
 dv_min_ga = 50;        % Arbitrary chosen value of total cost
 t_opt_ga  = [0, 0, 0]; % Storage value for the chosen windows
 
@@ -203,12 +204,14 @@ date_dep_grad = mjd20002date(t_refined_grad(1));
 date_fb_grad  = mjd20002date(t_refined_grad(2));
 date_arr_grad = mjd20002date(t_refined_grad(3));
 
-%% Refinamiento Simulated Annealing
-
+%% Simulated annealing refining method
+% Options for simulated annealing
 options_sa = optimoptions('simulannealbnd', 'MaxIterations', 2000, 'Display', 'off', 'PlotFcns', []);
 
+% Simulated annealing solver
 [t_refined_sa, dv_min_sa] = simulannealbnd(@(t) interplanetary(t(1), t(2), t(3)), t_opt_ga, lower_ga, upper_ga, options_sa);
 
+% Results with simulated annealing
 date_dep_sa = mjd20002date(t_refined_sa(1));
 date_fb_sa = mjd20002date(t_refined_sa(2));
 date_arr_sa = mjd20002date(t_refined_sa(3));
@@ -374,7 +377,7 @@ u = cross(vinfmin_vec,vinfplus_vec)/norm(cross(vinfmin_vec,vinfplus_vec));
 
 betam = pi/2 - deltam/2;
 
-dir_vm = vinfmin_vec/norm(vinfmin_vec); % Vinf- velocity direction
+dir_vm = vinfmin_vec/norm(vinfmin_vec);   % Vinf- velocity direction
 dir_vp = vinfplus_vec/norm(vinfplus_vec); % Vinf+ velocity direction
 
 dirm = Rotate(dir_vm, u, deltam/2); 
@@ -405,7 +408,6 @@ hold on;
 
 plot3(Y_fb_min(:, 1) / Re, Y_fb_min(:, 2) / Re, Y_fb_min(:, 3) / Re, 'Color', [0.4940 0.1840 0.5560], 'LineWidth', 1.5, 'DisplayName', 'Flyby hyperbola (infront)');
 plot3(Y_fb_plus(:, 1) / Re, Y_fb_plus(:, 2) / Re, Y_fb_plus(:, 3) / Re, 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 1.5);
-%plot3(0, 0, 0, 'yo', 'MarkerSize', 15, 'MarkerFaceColor', 'blue');
 Planet3d(0, [0, 0, 0], 'RE'); 
 
 view(3);
@@ -469,7 +471,6 @@ legend('Chosen time window');
 hold off
 
 %% PorkChop plot
-
 
 % 3D Pork Chop Plot: Mercury to Earth
 figure('Name', '3D Pork chop plot: Mercury to Earth', 'NumberTitle', 'on', 'Position', [0, -30, 500, 300], 'Color', [1 1 1])
