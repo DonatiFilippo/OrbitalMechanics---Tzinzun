@@ -225,10 +225,11 @@ TC = TC';
 for l = 1:N
     [a_car(l), e_car(l), i_car(l), OM_car(l), om_car(l), theta_car(l)] = rv2parorb(Y(1:3, l), Y(4:end, l), muE);
 end
+toc
 OM_car = unwrap(OM_car);
 om_car = unwrap(om_car);
 theta_car = unwrap(theta_car);
-toc
+
 
 % Propagation of Keplerian elements using Gauss' equations
 tic
@@ -418,6 +419,14 @@ grid on
 xlabel('Time [T]')
 ylabel('|θ_c_a_r - θ_g_a_u_s_s|/2π [-]')
 title("Pericenter anomaly's relative error")
+
+%% ACCURACY COMPARISON
+a_inf = max(abs(a_car-KEP(1,:)));
+e_inf = max(abs(e_car-KEP(2,:)));
+i_inf = max(abs(i_car-KEP(3,:)));
+OMi_car_inf = max(abs(OM_car-KEP(4,:)));
+om_inf = max(abs(om_car-KEP(5,:)));
+theta_inf = max(abs(theta_car-KEP(6,:)));
 
 %% ORBIT'S EVOLUTION
 % ATTENZIONE: LA RAPPRESENTAZIONE DELL'ORBITA PUO' ESSERE MIGLIORATA
