@@ -262,26 +262,26 @@ nexttile
 plot(TC/T, a_car, 'b-')
 grid on
 xlim([0 n_orb])
-xlabel('Time [T]','FontSize','13')
-ylabel('a_c_a_r [km]','FontSize','13')
-title("Evolution of semi-major axis Cartesian method","FontSize",'15')
+xlabel('Time [T]')
+ylabel('a_c_a_r [km]')
+title("Evolution of semi-major axis Cartesian method")
 
 
 nexttile
 plot(TKEP/T, KEP(1,:), 'b-')
 grid on
 xlim([0 n_orb])
-xlabel('Time [T]','FontSize','13')
-ylabel('a_g_a_u_s_s [km]','FontSize','13')
-title("Evolution of semi-major axis Gauss method","FontSize",'15')
+xlabel('Time [T]')
+ylabel('a_g_a_u_s_s [km]')
+title("Evolution of semi-major axis Gauss method")
 
 nexttile
 semilogy(TKEP/T, abs(a_car-KEP(1,:))/kep0(1), 'b-')
 grid on
 xlim([0 n_orb])
-xlabel('Time [T]','FontSize','13')
-ylabel('|a_c_a_r - a_g_a_u_s_s|/a0 [-]','FontSize','13')
-title("Semi-major axis' relative error","FontSize",'15')
+xlabel('Time [T]')
+ylabel('|a_c_a_r - a_g_a_u_s_s|/a0 [-]')
+title("Semi-major axis' relative error")
 
 % -------------------------------------------------------------------------
 
