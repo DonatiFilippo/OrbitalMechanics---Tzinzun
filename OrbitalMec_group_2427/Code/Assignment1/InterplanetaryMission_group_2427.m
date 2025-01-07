@@ -364,25 +364,31 @@ hold off;
 
 %% Fly-by trajectory (planetocentric)
 % Results
-CA = rp - Re; % Altitude of closest approach
-afb1 = -muE / norm(vinfmin_vec)^2;
-afb2 = -muE / norm(vinfplus_vec)^2;
-efb1 = 1 + rp * norm(vinfmin_vec)^2 / muE;
-efb2 = 1 + rp * norm(vinfplus_vec)^2 / muE;
+mS = astroConstants(4)/astroConstants(1);
+mE = astroConstants(13)/astroConstants(1);
 
-SOI = norm(r2) * (muE/muS)^(2/5);
+CA = rp - Re; % Altitude of closest approach
+
+afb1 = -muE / vinfm^2;
+afb2 = -muE / vinfp^2;
+efb1 = 1 + rp * vinfm^2 / muE;
+efb2 = 1 + rp * vinfp^2 / muE;
+
+SOI = norm(r2) * (mE/mS)^(2/5);
 h1 = vpm*rp;
 h2 = vpp*rp;
-theta1 = acos((h1^2/(muE * SOI) - 1) / efb1);
-theta2 = acos((h2^2/(muE * SOI) - 1) / efb2);
+theta1 = acos(h1^2/(muE * SOI * efb1) - 1/efb1);
+theta2 = acos(h2^2/(muE * SOI * efb2) - 1/efb2);
 
-Mfb1 = 2 * atanh(tan(theta1 / 2) * sqrt((efb1 - 1) / (efb1 + 1)));
-Mfb2 = 2 * atanh(tan(theta2 / 2) * sqrt((efb2 - 1) / (efb2 + 1)));
-Efb1 = efb1 * sinh(Mfb1) - Mfb1;
-Efb2 = efb2 * sinh(Mfb2) - Mfb2;
-tSOI1 = -sqrt(-1)*Mfb1*sqrt(afb1^3/muE);	% [s]
-tSOI2 = -sqrt(-1)*Mfb2*sqrt(afb2^3/muE);	% [s]
-tSOI_tot = (tSOI1 + tSOI2) / 3600;		% [h]
+Efb1 = 2 * atanh(tan(theta1 / 2) * sqrt((efb1 - 1) / (efb1 + 1)));
+Efb2 = 2 * atanh(tan(theta2 / 2) * sqrt((efb2 - 1) / (efb2 + 1)));
+Kfb1 = efb1 * sinh(Efb1) - Efb1;
+Kfb2 = efb2 * sinh(Efb2) - Efb2;
+
+dtSOI1 = sqrt(-(afb1^3)/muE)*Kfb1;	% [s]
+dtSOI2 = sqrt(-(afb2^3)/muE)*Kfb2;	% [s]
+
+tSOI_tot = (dtSOI1 + dtSOI2) / 3600;		% [h]
 
 
 fileID = fopen(filename,'a+');
