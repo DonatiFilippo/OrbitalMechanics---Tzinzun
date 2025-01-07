@@ -305,9 +305,9 @@ fclose(fileID);
 % Initialisation
 N_t = 50000;
 
-t_dep = t_refined_grad(1) * 86400;
-t_fb  = t_refined_grad(2) * 86400;
-t_arr = t_refined_grad(3) * 86400;
+t_dep = t_opt_sol(1) * 86400;
+t_fb  = t_opt_sol(2) * 86400;
+t_arr = t_opt_sol(3) * 86400;
 
 dt_leg1 = t_fb - t_dep;
 dt_leg2 = t_arr - t_fb;
