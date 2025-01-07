@@ -282,8 +282,8 @@ date_arr_sol = mjd20002date(t_opt_sol(3));
 v1_t = v1t';        
 v2_t = v2t_1';  
 
-[a1, e1, i1, Omega1, omega1, nu1] = car2kep(r1, v1_t);
-[a2, e2, i2, Omega2, omega2, nu2] = car2kep(r2, v2_t); 
+[a1, e1, i1, Omega1, omega1, nu1] = car2kep(r1, v1_t, muS);
+[a2, e2, i2, Omega2, omega2, nu2] = car2kep(r2, v2_t, muS); 
 
 fileID = fopen(filename,'a+');
 fprintf(fileID,'The final solutions are :\n\n');
