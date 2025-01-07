@@ -365,11 +365,31 @@ hold off;
 %% Fly-by trajectory (planetocentric)
 % Results
 CA = rp - Re; % Altitude of closest approach
+afb1 = -muE / norm(vinfmin_vec)^2;
+afb2 = -muE / norm(vinfplus_vec)^2;
+efb1 = 1 + rp * norm(vinfmin_vec)^2 / muE;
+efb2 = 1 + rp * norm(vinfplus_vec)^2 / muE;
+
+SOI = norm(r2) * (muE/muS)^(2/5);
+h1 = vpm*rp;
+h2 = vpp*rp;
+theta1 = acos((h1^2/(muE * SOI) - 1) / efb1);
+theta2 = acos((h2^2/(muE * SOI) - 1) / efb2);
+
+Mfb1 = 2 * atanh(tan(theta1 / 2) * sqrt((efb1 - 1) / (efb1 + 1)));
+Mfb2 = 2 * atanh(tan(theta2 / 2) * sqrt((efb2 - 1) / (efb2 + 1)));
+Efb1 = efb1 * sinh(Mfb1) - Mfb1;
+Efb2 = efb2 * sinh(Mfb2) - Mfb2;
+tSOI1 = -sqrt(-1)*Mfb1*sqrt(afb1^3/muE);	% [s]
+tSOI2 = -sqrt(-1)*Mfb2*sqrt(afb2^3/muE);	% [s]
+tSOI_tot = (tSOI1 + tSOI2) / 3600;		% [h]
+
 
 fileID = fopen(filename,'a+');
 fprintf(fileID,'The altitude of the closest approach is : %f km \n\n', CA);
 fprintf(fileID,'The total velocity change due to flyby is : %f km/s \n', dv_fb_tot);
 fprintf(fileID,'The cost of the manoeuvre at pericentre is : %f km/s \n\n', dv_fb_pow);
+fprintf(fileID,'Time spent in Earth SOI: %.3f hours\n',tSOI_tot);
 fclose(fileID);
 
 % Initial conditions planetocentric
