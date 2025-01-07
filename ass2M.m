@@ -218,6 +218,7 @@ options = odeset('RelTol', 1e-13, 'AbsTol', 1e-14);
 % Propagation in Cartesian coordinates
 tic
 [TC, Y] = ode113 (@(t,y) ode_2bp_perturbed(t, y, muE, muM, RE, J2, date), tv, y0, options); 
+toc
 Y = Y';
 TC = TC';
 
@@ -225,7 +226,7 @@ TC = TC';
 for l = 1:N
     [a_car(l), e_car(l), i_car(l), OM_car(l), om_car(l), theta_car(l)] = rv2parorb(Y(1:3, l), Y(4:end, l), muE);
 end
-toc
+
 OM_car = unwrap(OM_car);
 om_car = unwrap(om_car);
 theta_car = unwrap(theta_car);
@@ -234,9 +235,9 @@ theta_car = unwrap(theta_car);
 % Propagation of Keplerian elements using Gauss' equations
 tic
 [TKEP, KEP] = ode113 (@(t,kep)  Gauss_TNH(t, kep, muE, RE, J2, muM, date), tv, kep0, options);
+toc
 KEP = KEP';
 TKEP = TKEP';
-toc
 
 % Conversion to degrees of Keplerian elements obtained from Cartesian
 % coordinates propagation for readability
@@ -339,8 +340,8 @@ title("Inclination's relative error")
 figure
 plot(TC/T, OM_car, 'b-')
 grid on
-% xlim([0 50])
-% ylim([OM_car(N/500 * 50) OM_car(1)])
+xlim([0 100])
+ylim([OM_car(N/500 * 100) OM_car(1)])
 xlabel('Time [T]')
 ylabel('Ω_c_a_r [deg]')
 title("Evolution of RAAN Cartesian method")
@@ -348,8 +349,8 @@ title("Evolution of RAAN Cartesian method")
 figure
 plot(TKEP/T, KEP(4,:), 'b-')
 grid on
-% xlim([0 50])
-% ylim([KEP(4, (N/500 * 50)) KEP(4,1)])
+xlim([0 100])
+ylim([KEP(4, (N/500 * 100)) KEP(4,1)])
 xlabel('Time [T]')
 ylabel('Ω_g_a_u_s_s [deg]')
 title("Evolution of RAAN Gauss method")
@@ -357,7 +358,7 @@ title("Evolution of RAAN Gauss method")
 figure
 semilogy(TKEP/T, abs(OM_car-KEP(4,:))/(2*pi), 'b-')
 grid on
-% xlim([0 50])
+xlim([0 100])
 xlabel('Time [T]')
 ylabel('|Ω_c_a_r - Ω_g_a_u_s_s|/2π [-]')
 title("RAAN's relative error")
@@ -368,8 +369,8 @@ title("RAAN's relative error")
 figure
 plot(TC/T, om_car, 'b-')
 grid on
-% xlim([0 50])
-% ylim([om_car(1) om_car(N/500 * 50)])
+xlim([0 100])
+ylim([om_car(1) om_car(N/500 * 100)])
 xlabel('Time [T]')
 ylabel('ω_c_a_r [deg]')
 title("Evolution of pericenter anomaly Cartesian method")
@@ -377,8 +378,8 @@ title("Evolution of pericenter anomaly Cartesian method")
 figure
 plot(TKEP/T, KEP(5,:), 'b-')
 grid on
-% xlim([0 50])
-% ylim([KEP(5,1) KEP(5, (N/500 * 50))])
+xlim([0 100])
+ylim([KEP(5,1) KEP(5, (N/500 * 100))])
 xlabel('Time [T]')
 ylabel('ω_g_a_u_s_s [deg]')
 title("Evolution of pericenter anomaly Gauss method")
@@ -386,7 +387,7 @@ title("Evolution of pericenter anomaly Gauss method")
 figure
 semilogy(TKEP/T, abs(om_car-KEP(5,:))/(2*pi), 'b-')
 grid on
-% xlim([0 50])
+xlim([0 100])
 xlabel('Time [T]')
 ylabel('|ω_c_a_r - ω_g_a_u_s_s|/2π [-]')
 title("Pericenter anomaly's relative error")
@@ -397,8 +398,8 @@ title("Pericenter anomaly's relative error")
 figure
 plot(TC/T, theta_car, 'b-')
 grid on
-% xlim([0 50])
-% ylim([theta_car(1) theta_car(N/500 * 50)])
+xlim([0 100])
+ylim([theta_car(1) theta_car(N/500 * 100)])
 xlabel('Time [T]')
 ylabel('θ_c_a_r [deg]')
 title("Evolution of true anomaly Cartesian method")
@@ -406,8 +407,8 @@ title("Evolution of true anomaly Cartesian method")
 figure
 plot(TKEP/T, KEP(6,:), 'b-')
 grid on
-% xlim([0 50])
-% ylim([KEP(6,1) KEP(6, (N/500 * 50))])
+xlim([0 100])
+ylim([KEP(6,1) KEP(6, (N/500 * 100))])
 xlabel('Time [T]')
 ylabel('θ_g_a_u_s_s [deg]')
 title("Evolution of true anomaly Gauss method")
@@ -415,7 +416,7 @@ title("Evolution of true anomaly Gauss method")
 figure
 semilogy(TKEP/T, abs(theta_car-KEP(6,:))/(2*pi), 'b-')
 grid on
-% xlim([0 50])
+xlim([0 100])
 xlabel('Time [T]')
 ylabel('|θ_c_a_r - θ_g_a_u_s_s|/2π [-]')
 title("Pericenter anomaly's relative error")
@@ -476,7 +477,7 @@ legend('Complete', 'Secular')
 
 % Eccentricity
 e_lt = movmean(KEP(2,:), N/n_orb);
-e_s = movmean(KEP(2,:), N*2/30);
+e_s = movmean(KEP(2,:), N/15);
 
 figure
 plot(TKEP/T, KEP(2,:), 'b-', TKEP/T, e_lt, 'g-', TKEP/T, e_s, 'r-', 'LineWidth', 2)
@@ -489,7 +490,7 @@ legend('Complete', 'Long term', 'Secular')
 
 % Inclination
 i_lt = movmean(KEP(3,:), N/n_orb);
-i_s = movmean(KEP(3,:), N*2/30);
+i_s = movmean(KEP(3,:), N/15);
 
 figure
 plot(TKEP/T, KEP(3,:), 'b-', TKEP/T, i_lt, 'g-', TKEP/T, i_s, 'r-', 'LineWidth', 2)
@@ -506,8 +507,8 @@ OM_s = movmean(KEP(4,:), N/n_orb);
 figure
 plot(TKEP/T, KEP(4,:), 'b-', TKEP/T, OM_s, 'r-', 'LineWidth', 2)
 grid on
-xlim([0 50])
-ylim([KEP(4, (N/500 * 50)) KEP(4,1)])
+xlim([0 100])
+ylim([KEP(4, (N/500 * 100)) KEP(4,1)])
 xlabel('Time [T]')
 ylabel('Ω [deg]')
 title("RAAN")
@@ -515,7 +516,7 @@ legend('Complete', 'Secular')
 
 % Pericenter anomaly
 om_lt = movmean(KEP(5,:), N/n_orb);
-om_s = movmean(KEP(5,:), N*2/30);
+om_s = movmean(KEP(5,:), N/15);
 
 figure
 plot(TKEP/T, KEP(5,:), 'b-', TKEP/T, om_lt, 'g-', TKEP/T, om_s, 'r-','LineWidth', 2)
@@ -533,8 +534,8 @@ theta_s = movmean(KEP(6,:), N/n_orb);
 figure
 plot(TKEP/T, KEP(6,:), 'b-', TKEP/T, theta_s, 'r-', 'LineWidth', 2)
 grid on
-xlim([0 50])
-ylim([KEP(6,1) KEP(6, (N/500 * 50))])
+xlim([0 100])
+ylim([KEP(6,1) KEP(6, (N/500 * 100))])
 xlabel('Time [T]')
 ylabel('θ [deg]')
 title("True anomaly")
