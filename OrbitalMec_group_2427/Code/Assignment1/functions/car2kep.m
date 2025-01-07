@@ -34,64 +34,83 @@ function [a, e, i, Omega, omega, nu] = car2kep(varargin)
 %   Domenichelli Eleonora
 %
 %--------------------------------------------------------------------------
-muS = astroConstants(4); 
-    if nargin == 1 && isvector(varargin{1})
-        State = varargin{1};
-        r = State(1:3);
-        v = State(4:6);
-    elseif nargin == 2
-        r = varargin{1};
-        v = varargin{2};
-    end
-    
-    r_norm = norm(r);
-    v_norm = norm(v);
 
-    h = cross(r, v);
-    h_norm = norm(h);
-    
-    i = acos(h(3) / h_norm);
-    
-    N = cross([0, 0, 1], h);
-    N_norm = norm(N);
-    
-    if N_norm ~= 0
-        Omega = acos(N(1) / N_norm);
-        if N(2) < 0
-            Omega = 2 * pi - Omega;
+if nargin == 0 % if no inputs, break
+    error('At least 1 input argument required.');
+else    
+    if nargin < 3 % if mu is not specified, use Earth's
+        constants; % load constants from file
+        mu = mu_E;
+    end
+    if nargin == 1 % if X is a state-vector and V is not specified
+        if length(X) == 6
+            V = X(4:6);
+            X = X(1:3);
+        else
+            error('The state-vector has to have 6 components.');
         end
-    else
-        Omega = 0;
+    else % check X and V have 3 components each
+        if length(X) ~= 3 || length(V) ~= 3
+            error('The position and velocity vectors have to have 3 components each.');
+        end
     end
     
-    e_vec = (1 / muS) * ((v_norm^2 - muS / r_norm) * r - dot(r, v) * v);
-    e = norm(e_vec);
+    r = norm(X);
+    v = norm(V);
+    h = cross(X,V);
+    N = cross([0;0;1],h);
     
-    if N_norm ~= 0
-        omega = acos(dot(N, e_vec) / (N_norm * e));
-        if e_vec(3) < 0
-            omega = 2 * pi - omega;
-        end
+    a = 1/(2/r - v^2/mu);
+    e = 1/mu*cross(V,h) - X/r;
+    i = acos(h(3)/norm(h));
+    Nxy = sqrt(N(1)^2 + N(2)^2);
+    raan = atan2(N(2)/Nxy,N(1)/Nxy);
+    
+    NN = N/norm(N);
+    ee = e/norm(e);
+    omega = sign(dot(cross(NN,e),h))*acos(dot(ee,NN));
+    f = sign(dot(cross(e,X),h))*acos(dot(X/r,ee));
+    
+    e = norm(e);
+    i = i*180/pi;
+    if isnan(raan) % If the raan is not defined, assign (arbitrary) 0 value
+        raan = 0;
     else
+        raan = raan*180/pi;
+        if raan < 0
+            raan = raan + 360;
+        end
+    end
+    if isnan(omega) % If omega is not defined, assign (arbitrary) 0 value
         omega = 0;
+    else
+        omega = omega*180/pi;
+        if omega < 0
+            omega = omega + 360;
+        end
     end
-    
-    % 7. Análisis verdadero (nu)
-    nu = acos(dot(e_vec, r) / (e * r_norm));
-    if dot(r, v) < 0
-        nu = 2 * pi - nu;
+    f = f*180/pi;
+    if f < 0
+        f = f + 360;
     end
-    
-    % 8. Semi-eje mayor (a)
-    epsilon = (v_norm^2) / 2 - muS / r_norm; 
-    if e ~= 1 % Para órbitas elípticas
-        a = -muS / (2 * epsilon);
-    else 
-        a = Inf;
-    end
+    M = meanAnomaly(f,e);
+end
+end
 
-    i = rad2deg(i);
-    Omega = rad2deg(Omega);
-    omega = rad2deg(omega);
-    nu = rad2deg(nu);
+function M = meanAnomaly(f,e)
+% function M = meanAnomaly(f,e)
+% Computes mean anomaly for an elliptical orbit
+% Required inputs:
+%   f: true anomaly [deg]
+%   e: eccentricity [-]
+% Outputs:
+%   M: mean anomaly [deg]
+
+f = f*pi/180;
+E = 2*atan(sqrt((1 - e)/(1 + e))*tan(f/2)); % compute eccentric anomaly
+M = E - e*sin(E); % compute mean anomaly
+M = M*180/pi;
+if M < 0
+    M = M + 360;
+end
 end
