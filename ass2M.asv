@@ -262,8 +262,8 @@ nexttile
 plot(TC/T, a_car, 'b-')
 grid on
 xlim([0 n_orb])
-xlabel('Time [T]','FontSize','13')
-ylabel('a_c_a_r [km]','FontSize','13')
+xlabel('Time [T]')
+ylabel('a_c_a_r [km]')
 title("Evolution of semi-major axis Cartesian method","FontSize",'15')
 
 
