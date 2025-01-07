@@ -62,7 +62,7 @@ T = 2*pi*sqrt(a^3/muE); % Nominal orbit's period [s]
 % Setting parameters for orbit representation
 th0 = 0; % True anomaly of initial point [rad]
 thf = 2*pi; % True anomaly of final point [rad]
-dth = 0.1; % Resolution [rad]
+dth = 0.01; % Resolution [rad]
 
 Earth_3D
 hold on
