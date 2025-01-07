@@ -34,7 +34,7 @@ function [a, e, i, Omega, omega, nu] = car2kep(varargin)
 %   Domenichelli Eleonora
 %
 %--------------------------------------------------------------------------
-
+muS = astroConstants(4); 
     if nargin == 1 && isvector(varargin{1})
         State = varargin{1};
         r = State(1:3);
@@ -44,18 +44,14 @@ function [a, e, i, Omega, omega, nu] = car2kep(varargin)
         v = varargin{2};
     end
     
-    % 1. Normas de los vectores de posición y velocidad
     r_norm = norm(r);
     v_norm = norm(v);
-    
-    % 2. Vector de momento angular especifico (h)
+
     h = cross(r, v);
     h_norm = norm(h);
     
-    % 3. Cálculo de la inclinación (i)
     i = acos(h(3) / h_norm);
     
-    % 4. Nodo ascendente
     N = cross([0, 0, 1], h);
     N_norm = norm(N);
     
@@ -68,11 +64,9 @@ function [a, e, i, Omega, omega, nu] = car2kep(varargin)
         Omega = 0;
     end
     
-    % 5. Vector de excentricidad
-    e_vec = (1 / 398600) * ((v_norm^2 - 398600 / r_norm) * r - dot(r, v) * v);
+    e_vec = (1 / muS) * ((v_norm^2 - muS / r_norm) * r - dot(r, v) * v);
     e = norm(e_vec);
     
-    % 6. Argumento del periapsis (omega)
     if N_norm ~= 0
         omega = acos(dot(N, e_vec) / (N_norm * e));
         if e_vec(3) < 0
@@ -89,14 +83,13 @@ function [a, e, i, Omega, omega, nu] = car2kep(varargin)
     end
     
     % 8. Semi-eje mayor (a)
-    epsilon = (v_norm^2) / 2 - 398600 / r_norm; % Energía específica
+    epsilon = (v_norm^2) / 2 - muS / r_norm; 
     if e ~= 1 % Para órbitas elípticas
-        a = -398600 / (2 * epsilon);
-    else % Para órbitas parabólicas
+        a = -muS / (2 * epsilon);
+    else 
         a = Inf;
     end
-    
-    % Convertir los ángulos de radianes a grados
+
     i = rad2deg(i);
     Omega = rad2deg(Omega);
     omega = rad2deg(omega);
