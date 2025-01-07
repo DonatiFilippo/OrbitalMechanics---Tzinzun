@@ -287,9 +287,9 @@ v2_t = v2t_1';
 
 fileID = fopen(filename,'a+');
 fprintf(fileID,'The final solutions are :\n\n');
-fprintf(fileID,'Departure: %02d/%02d/%04d \n', date_dep_sol(3), date_dep_sol(2), date_dep_sol(1));
-fprintf(fileID,'Flyby: %02d/%02d/%04d \n', date_fb_sol(3), date_fb_sol(2), date_fb_sol(1));
-fprintf(fileID,'Arrival: %02d/%02d/%04d \n', date_arr_sol(3), date_arr_sol(2), date_arr_sol(1));
+fprintf(fileID,'Departure: %02d/%02d/%04d - %02d:%02d:%02d \n', date_dep_sol(3), date_dep_sol(2), date_dep_sol(1), date_dep_sol(4), date_dep_sol(5),date_dep_sol(6));
+fprintf(fileID,'Flyby: %02d/%02d/%04d - %02d:%02d:%02d \n', date_fb_sol(3), date_fb_sol(2), date_fb_sol(1), date_fb_sol(4), date_fb_sol(5), date_fb_sol(6));
+fprintf(fileID,'Arrival: %02d/%02d/%04d - %02d:%02d:%02d \n', date_arr_sol(3), date_arr_sol(2), date_arr_sol(1), date_arr_sol(4), date_arr_sol(5), date_arr_sol(6));
 fprintf(fileID,'Mercury to Earth Orbit: ');
 fprintf(fileID,'a = %.2f km, e = %.5f, i = %.2f°, Ω = %.2f°, ω = %.2f°, ν = %.2f°\n', a1, e1, i1, Omega1, omega1, nu1);
 fprintf(fileID,'Earth to Asteroid Orbit: ');
@@ -406,8 +406,8 @@ y0p = [r0; vp];
 figure('Name', 'Fly-by trajectory (planetocentric)', 'NumberTitle', 'on', 'Position', [500, 250, 400, 400], 'Color', [1 1 1]);
 hold on;
 
-plot3(Y_fb_min(:, 1) / Re, Y_fb_min(:, 2) / Re, Y_fb_min(:, 3) / Re, 'Color', [0.4940 0.1840 0.5560], 'LineWidth', 1.5, 'DisplayName', 'Flyby hyperbola (infront)');
-plot3(Y_fb_plus(:, 1) / Re, Y_fb_plus(:, 2) / Re, Y_fb_plus(:, 3) / Re, 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 1.5);
+plot3(Y_fb_min(:, 1) / Re, Y_fb_min(:, 2) / Re, Y_fb_min(:, 3) / Re, 'Color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5, 'DisplayName', 'Flyby hyperbola (infront)');
+plot3(Y_fb_plus(:, 1) / Re, Y_fb_plus(:, 2) / Re, Y_fb_plus(:, 3) / Re, 'Color', [0.4940 0.1840 0.5560], 'LineWidth', 1.5);
 Planet3d(0, [0, 0, 0], 'RE'); 
 
 view(3);
@@ -473,7 +473,7 @@ hold off
 %% PorkChop plot
 
 % 3D Pork Chop Plot: Mercury to Earth
-figure('Name', '3D Pork chop plot: Mercury to Earth', 'NumberTitle', 'on', 'Position', [0, -30, 500, 300], 'Color', [1 1 1])
+figure('Name', '3D visualization of Transfer Delta-V: Mercury to Earth', 'NumberTitle', 'on', 'Position', [0, -30, 500, 300], 'Color', [1 1 1])
 hold on
 grid on
 title('3D Pork chop plot: Mercury to Earth')
@@ -497,7 +497,7 @@ view(3)
 hold off
 
  
-figure('Name', '3D Pork chop plot: Earth to Asteroid', 'NumberTitle', 'on', 'Position', [400, -30, 500, 300], 'Color', [1 1 1])
+figure('Name', '3D visualization of Transfer Delta-V: Earth to Asteroid', 'NumberTitle', 'on', 'Position', [400, -30, 500, 300], 'Color', [1 1 1])
 hold on
 grid on
 title('3D Pork chop plot: Earth to Asteroid')
